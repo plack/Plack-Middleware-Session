@@ -2,6 +2,8 @@ package Plack::Session::State;
 use strict;
 use warnings;
 
+use Digest::SHA1 ();
+
 use Plack::Util::Accessor qw[
     session_key
     sid_generator
@@ -13,7 +15,6 @@ sub new {
     $params{'_expired'}      ||= +{};
     $params{'session_key'}   ||= 'plack_session';
     $params{'sid_generator'} ||= sub {
-        require Digest::SHA1;
         Digest::SHA1::sha1_hex(rand() . $$ . {} . time)
     };
 

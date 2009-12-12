@@ -1,0 +1,23 @@
+use strict;
+use warnings;
+use inc::Module::Install;
+
+name 'Plack-Session';
+all_from 'lib/Plack/Session.pm';
+license 'perl';
+
+# prereqs
+requires 'Plack'            => '0.9021';
+requires 'Plack::Request'   => '0.08';
+
+# for session ID gen
+requires 'Digest::SHA'      => '0';
+
+# things the tests need
+build_requires 'Test::More' => '0.88';
+
+tests_recursive;
+auto_install;
+
+WriteAll();
+
