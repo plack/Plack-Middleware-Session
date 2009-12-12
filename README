@@ -1,4 +1,4 @@
-Plack::Session version 0.01
+Plack::Middleware::Session version 0.01
 ===========================
 
 See the individual module documentation for more information
