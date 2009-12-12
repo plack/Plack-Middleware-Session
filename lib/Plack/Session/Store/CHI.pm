@@ -2,17 +2,18 @@ package Plack::Session::Store::CHI;
 use strict;
 use warnings;
 
-use Plack::Util::Accessor qw[ chi ];
 use Scalar::Util qw/blessed/;
+
+use parent 'Plack::Session::Store';
+
+use Plack::Util::Accessor qw[ chi ];
 
 sub new {
     my ($class, %params) = @_;
     unless ( blessed $params{chi} and $params{chi}->isa('CHI::Driver') ) {
         die('require chi driver');
     }
-    bless {
-        chi => $params{chi},
-    } => $class;
+    bless { %params } => $class;
 }
 
 sub fetch {
@@ -43,11 +44,6 @@ sub delete {
     $self->chi->set($session_id => $cache);
 }
 
-sub persist {
-    my ($self, $session_id) = @_;
-    ()
-}
-
 sub cleanup {
     my ($self, $session_id) = @_;
     $self->chi->remove($session_id);
@@ -59,7 +55,7 @@ __END__
 
 =head1 NAME
 
-Plack::Session::Store::CHI
+Plack::Session::Store::CHI - CHI session store
 
 =head1 SYNOPSIS
 
@@ -76,6 +72,29 @@ Plack::Session::Store::CHI
       $app;
   };
 
+=head1 METHODS
+
+=over 4
+
+=item B<new ( %params )>
+
+=back
+
+=over 4
+
+=item B<fetch ( $session_id, $key )>
+
+=item B<store ( $session_id, $key, $data )>
+
+=item B<delete ( $session_id, $key )>
+
+=back
+
+=over 4
+
+=item B<cleanup ( $session_id )>
+
+=back
 
 =head1 AUTHOR
 
