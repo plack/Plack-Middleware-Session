@@ -25,9 +25,14 @@ sub expire_session_id {
     $self->{'_expired'}->{ $id }++;
 }
 
+sub is_session_expired {
+    my ($self, $id) = @_;
+    exists $self->{'_expired'}->{ $id }
+}
+
 sub check_expired {
     my ($self, $id) = @_;
-    return unless $id && not exists $self->{'_expired'}->{ $id };
+    return unless $id && not $self->is_session_expired( $id );
     return $id;
 }
 

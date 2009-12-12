@@ -9,10 +9,11 @@ use Test::Exception;
 use Plack::Request;
 
 use Plack::Session;
-use Plack::Session::State;
+use Plack::Session::State::Cookie;
 use Plack::Session::Store;
 
 sub request {
+    my $cookies = shift;
     open my $in, '<', \do { my $d };
     my $env = {
         'psgi.version'    => [ 1, 0 ],
@@ -21,14 +22,13 @@ sub request {
         'psgi.url_scheme' => 'http',
         SERVER_PORT       => 80,
         REQUEST_METHOD    => 'GET',
+        HTTP_COOKIE       => join "; " => map { $_ . "=" . $cookies->{ $_ } } keys %$cookies,
     };
-    my $r = Plack::Request->new( $env );
-    $r->parameters( @_ );
-    $r;
+    return Plack::Request->new( $env );
 }
 
 my $storage = Plack::Session::Store->new;
-my $state   = Plack::Session::State->new;
+my $state   = Plack::Session::State::Cookie->new;
 
 my @sids;
 {
@@ -55,6 +55,17 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value => $sids[0],
+                path  => '/'
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -68,7 +79,7 @@ my @sids;
 
     push @sids, $s->id;
 
-    isnt($sids[0], $sids[1], "no same Session ID");
+    isnt($sids[0], $sids[1], "... not the same session id");
     ok(!$s->get('foo'), '... no value stored for foo in session');
 
     lives_ok {
@@ -82,6 +93,17 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value => $sids[1],
+                path  => '/'
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -108,8 +130,18 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
-}
 
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value => $sids[0],
+                path  => '/'
+            }
+        },
+        '... got the right cookies in the response'
+    );
+}
 
 {
     my $r = request({ plack_session => $sids[1] });
@@ -129,6 +161,17 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value => $sids[1],
+                path  => '/'
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -153,6 +196,17 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value => $sids[0],
+                path  => '/'
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -169,6 +223,24 @@ my @sids;
     lives_ok {
         $s->expire;
     } '... expired session successfully';
+
+    my $resp = $r->new_response;
+
+    lives_ok {
+        $s->finalize( $resp );
+    } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value   => $sids[0],
+                path    => '/',
+                expires => '0'
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -184,6 +256,23 @@ my @sids;
     isnt($s->id, $sids[0], 'expired ... got a new session id');
 
     ok(!$s->get('bar'), '... no bar value stored');
+
+    my $resp = $r->new_response;
+
+    lives_ok {
+        $s->finalize( $resp );
+    } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value   => $sids[2],
+                path    => '/',
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 {
@@ -204,6 +293,17 @@ my @sids;
     lives_ok {
         $s->finalize( $resp );
     } '... finalized session successfully';
+
+    is_deeply(
+        $resp->cookies,
+        {
+            plack_session => {
+                value   => $sids[1],
+                path    => '/',
+            }
+        },
+        '... got the right cookies in the response'
+    );
 }
 
 done_testing;

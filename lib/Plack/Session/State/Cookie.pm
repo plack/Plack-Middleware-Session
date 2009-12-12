@@ -27,10 +27,18 @@ sub finalize {
     $response->cookies->{ $self->session_key } = +{
         value => $id,
         path  => ($self->path || '/'),
-        ( $self->domain  ? ( domain  => $self->domain  ) : () ),
-        ( $self->expires ? ( expires => $self->expires ) : () ),
-        ( $self->secure  ? ( secure  => $self->secure  ) : () ),
+        ( defined $self->domain  ? ( domain  => $self->domain  ) : () ),
+        ( defined $self->expires ? ( expires => $self->expires ) : () ),
+        ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
     };
+
+    # clear the expires after
+    # finalization if the session
+    # has been expired - SL
+    $self->expires( undef )
+        if defined $self->expires
+        && $self->expires == 0
+        && $self->is_session_expired( $id );
 }
 
 1;
