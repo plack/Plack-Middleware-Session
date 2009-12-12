@@ -14,6 +14,9 @@ use Plack::Session::Store::File;
 use t::lib::TestSession;
 
 my $TMP = File::Spec->catdir('t', 'tmp');
+if ( !-d $TMP ) {
+    mkdir $TMP;
+}
 
 t::lib::TestSession::run_all_tests(
     store           => Plack::Session::Store::File->new( dir => $TMP ),
