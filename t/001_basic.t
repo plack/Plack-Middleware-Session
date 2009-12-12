@@ -30,6 +30,7 @@ sub request {
 my $storage = Plack::Session::Store->new;
 my $state   = Plack::Session::State->new;
 
+my @sids;
 {
     my $r = request();
 
@@ -39,21 +40,21 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 1, '... got a basic session id (1)');
-
-    ok(!$s->get('foo'), '... no value stored in foo for session (1)');
+    push @sids, $s->id;
+    
+    ok(!$s->get('foo'), '... no value stored in foo for session');
 
     lives_ok {
         $s->set( foo => 'bar' );
-    } '... set the value successfully in session (1)';
+    } '... set the value successfully in session';
 
-    is($s->get('foo'), 'bar', '... got the foo value back successfully from session (1)');
+    is($s->get('foo'), 'bar', '... got the foo value back successfully from session');
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (1) successfully';
+    } '... finalized sessio successfully';
 }
 
 {
@@ -65,25 +66,26 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 2, '... got a basic session id (2)');
+    push @sids, $s->id;
 
-    ok(!$s->get('foo'), '... no value stored for foo in session (2)');
+    isnt($sids[0], $sids[1], "no same Session ID");
+    ok(!$s->get('foo'), '... no value stored for foo in session');
 
     lives_ok {
         $s->set( foo => 'baz' );
     } '... set the value successfully';
 
-    is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
+    is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (2) successfully';
+    } '... finalized session successfully';
 }
 
 {
-    my $r = request({ plack_session => 1 });
+    my $r = request({ plack_session => $sids[0] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -91,26 +93,26 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 1, '... got a basic session id (1)');
+    is($s->id, $sids[0], '... got a basic session id');
 
-    is($s->get('foo'), 'bar', '... got the value for foo back successfully from session (1)');
+    is($s->get('foo'), 'bar', '... got the value for foo back successfully from session');
 
     lives_ok {
         $s->remove( 'foo' );
-    } '... removed the foo value successfully from session (1)';
+    } '... removed the foo value successfully from session';
 
-    ok(!$s->get('foo'), '... no value stored for foo in session (1)');
+    ok(!$s->get('foo'), '... no value stored for foo in session');
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (1) successfully';
+    } '... finalized session successfully';
 }
 
 
 {
-    my $r = request({ plack_session => 2 });
+    my $r = request({ plack_session => $sids[1] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -118,19 +120,19 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 2, '... got a basic session id (2)');
+    is($s->id, $sids[1], '... got a basic session id');
 
-    is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
+    is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (2) successfully';
+    } '... finalized session successfully';
 }
 
 {
-    my $r = request({ plack_session => 1 });
+    my $r = request({ plack_session => $sids[0] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -138,23 +140,23 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 1, '... got a basic session id (1)');
+    is($s->id, $sids[0], '... got a basic session id');
 
-    ok(!$s->get('foo'), '... no value stored for foo in session (1)');
+    ok(!$s->get('foo'), '... no value stored for foo in session');
 
     lives_ok {
         $s->set( bar => 'baz' );
-    } '... set the bar value successfully in session (1)';
+    } '... set the bar value successfully in session';
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (1) successfully';
+    } '... finalized session successfully';
 }
 
 {
-    my $r = request({ plack_session => 1 });
+    my $r = request({ plack_session => $sids[0] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -162,17 +164,15 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 1, '... got a basic session id (1)');
-
-    is($s->get('bar'), 'baz', '... got the bar value back successfully from session (1)');
+    is($s->get('bar'), 'baz', '... got the bar value back successfully from session');
 
     lives_ok {
         $s->expire;
-    } '... expired session (1) successfully';
+    } '... expired session successfully';
 }
 
 {
-    my $r = request({ plack_session => 1 });
+    my $r = request({ plack_session => $sids[0] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -180,13 +180,14 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 3, '... got a new session id (3)');
+    push @sids, $s->id;
+    isnt($s->id, $sids[0], 'expired ... got a new session id');
 
-    ok(!$s->get('bar'), '... no bar value stored (from session (1)) in session (3)');
+    ok(!$s->get('bar'), '... no bar value stored');
 }
 
 {
-    my $r = request({ plack_session => 2 });
+    my $r = request({ plack_session => $sids[1] });
 
     my $s = Plack::Session->new(
         state   => $state,
@@ -194,15 +195,15 @@ my $state   = Plack::Session::State->new;
         request => $r,
     );
 
-    is($s->id, 2, '... got a basic session id (2)');
+    is($s->id, $sids[1], '... got a basic session id');
 
-    is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
+    is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
     my $resp = $r->new_response;
 
     lives_ok {
         $s->finalize( $resp );
-    } '... finalized session (2) successfully';
+    } '... finalized session successfully';
 }
 
 done_testing;

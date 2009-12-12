@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Plack::Util::Accessor qw[ session_key ];
+use Digest::SHA1;
 
 sub new {
     my ($class, %params) = @_;
@@ -37,10 +38,11 @@ sub extract {
     $self->check_expired( $request->param( $self->session_key ) );
 }
 
-{
-    my $id = 1;
-    sub generate { $id++ }
+sub generate {
+    my $self = shift;
+    return Digest::SHA1::sha1_hex(rand() . $$ . {} . time);
 }
+
 
 sub finalize {
     my ($self, $id, $response) = @_;
