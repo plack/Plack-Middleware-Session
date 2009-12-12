@@ -43,8 +43,9 @@ sub expire {
 }
 
 sub finalize {
-    my $self = shift;
-    $self->store->persist( $self->id )
+    my ($self, $response) = @_;
+    $self->store->persist( $self->id, $response );
+    $self->state->finalize( $self->id, $response );
 }
 
 1;

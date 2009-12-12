@@ -31,10 +31,12 @@ my $storage = Plack::Session::Store->new;
 my $state   = Plack::Session::State->new;
 
 {
+    my $r = request();
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request(),
+        request => $r,
     );
 
     is($s->id, 1, '... got a basic session id (1)');
@@ -47,16 +49,20 @@ my $state   = Plack::Session::State->new;
 
     is($s->get('foo'), 'bar', '... got the foo value back successfully from session (1)');
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (1) successfully';
 }
 
 {
+    my $r = request();
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request(),
+        request => $r,
     );
 
     is($s->id, 2, '... got a basic session id (2)');
@@ -69,16 +75,20 @@ my $state   = Plack::Session::State->new;
 
     is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (2) successfully';
 }
 
 {
+    my $r = request({ plack_session => 1 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 1 }),
+        request => $r,
     );
 
     is($s->id, 1, '... got a basic session id (1)');
@@ -91,33 +101,41 @@ my $state   = Plack::Session::State->new;
 
     ok(!$s->get('foo'), '... no value stored for foo in session (1)');
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (1) successfully';
 }
 
 
 {
+    my $r = request({ plack_session => 2 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 2 }),
+        request => $r,
     );
 
     is($s->id, 2, '... got a basic session id (2)');
 
     is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (2) successfully';
 }
 
 {
+    my $r = request({ plack_session => 1 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 1 }),
+        request => $r,
     );
 
     is($s->id, 1, '... got a basic session id (1)');
@@ -128,16 +146,20 @@ my $state   = Plack::Session::State->new;
         $s->set( bar => 'baz' );
     } '... set the bar value successfully in session (1)';
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (1) successfully';
 }
 
 {
+    my $r = request({ plack_session => 1 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 1 }),
+        request => $r,
     );
 
     is($s->id, 1, '... got a basic session id (1)');
@@ -150,10 +172,12 @@ my $state   = Plack::Session::State->new;
 }
 
 {
+    my $r = request({ plack_session => 1 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 1 }),
+        request => $r,
     );
 
     is($s->id, 3, '... got a new session id (3)');
@@ -162,18 +186,22 @@ my $state   = Plack::Session::State->new;
 }
 
 {
+    my $r = request({ plack_session => 2 });
+
     my $s = Plack::Session->new(
         state   => $state,
         store   => $storage,
-        request => request({ plack_session => 2 }),
+        request => $r,
     );
 
     is($s->id, 2, '... got a basic session id (2)');
 
     is($s->get('foo'), 'baz', '... got the foo value back successfully from session (2)');
 
+    my $resp = $r->new_response;
+
     lives_ok {
-        $s->finalize;
+        $s->finalize( $resp );
     } '... finalized session (2) successfully';
 }
 
