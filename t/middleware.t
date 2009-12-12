@@ -28,7 +28,6 @@ test_psgi $app, sub {
 
     my $req = GET "http://localhost/";
     $jar->add_cookie_header($req);
-    use XXX;
     $res = $cb->($req);
     is $res->content, "Counter=1";
 };

@@ -28,7 +28,7 @@ sub call {
     my $env  = shift;
 
     $env->{'psgix.session'} = Plack::Session->new(
-        state   => $self->state || $self->default_state,
+        state   => $self->state,
         store   => $self->store,
         request => Plack::Request->new( $env )
     );
