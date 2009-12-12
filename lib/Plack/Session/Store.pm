@@ -55,6 +55,8 @@ Plack::Session::Store - Basic in-memory session store
 
 =back
 
+=head2 Session Data Management
+
 =over 4
 
 =item B<fetch ( $session_id, $key )>
@@ -65,11 +67,21 @@ Plack::Session::Store - Basic in-memory session store
 
 =back
 
+=head2 Storage Management
+
 =over 4
 
 =item B<persist ( $session_id, $response )>
 
+This method will perform any data persistence nessecary to maintain
+data across requests. This method is called by the L<Plack::Session>
+C<finalize> method. The C<$response> is expected to be a L<Plack::Response>
+instance or an object with an equivalent interface.
+
 =item B<cleanup ( $session_id )>
+
+This method is called by the L<Plack::Session> C<expire> method and
+is used to remove any session data.
 
 =back
 

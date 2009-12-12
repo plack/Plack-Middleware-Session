@@ -53,6 +53,9 @@ Plack::Session::State::Cookie - Basic cookie-based session state
 
 =head1 DESCRIPTION
 
+This is a subclass of L<Plack::Session::State> and implements it's
+full interface.
+
 =head1 METHODS
 
 =over 4
@@ -66,20 +69,6 @@ Plack::Session::State::Cookie - Basic cookie-based session state
 =item B<expires>
 
 =item B<secure>
-
-=back
-
-=over 4
-
-=item B<extract ( $request )>
-
-=item B<finalize ( $session_id, $response )>
-
-=back
-
-=over 4
-
-=item B<expire_session_id ( $id )>
 
 =back
 

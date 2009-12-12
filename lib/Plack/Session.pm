@@ -68,13 +68,30 @@ Plack::Session - Middleware for session management
 
 =item B<new ( %params )>
 
+The constructor expects keys in C<%params> for I<state>,
+I<store> and I<request>. The I<request> param is expected to be
+a L<Plack::Request> instance or an object with an equivalent
+interface.
+
 =item B<id>
+
+This is the accessor for the session id.
 
 =item B<state>
 
+This is expected to be a L<Plack::Session::State> instance or
+an object with an equivalent interface.
+
 =item B<store>
 
+This is expected to be a L<Plack::Session::Store> instance or
+an object with an equivalent interface.
+
 =back
+
+=head2 Session Data Storage
+
+These methods delegate to appropriate methods on the C<store>.
 
 =over 4
 
@@ -86,11 +103,24 @@ Plack::Session - Middleware for session management
 
 =back
 
+=head2 Session Lifecycle Management
+
 =over 4
 
 =item B<expire>
 
+This method can be called to expire the current session id. It
+will call the C<cleanup> method on the C<store> and the C<finalize>
+method on the C<state>, passing both of them the session id and
+the C<$response>.
+
 =item B<finalize ( $response )>
+
+This method should be called at the end of the response cycle. It
+will call the C<persist> method on the C<store> and the
+C<expire_session_id> method on the C<state>, passing both of them
+the session id. The C<$response> is expected to be a L<Plack::Response>
+instance or an object with an equivalent interface.
 
 =back
 

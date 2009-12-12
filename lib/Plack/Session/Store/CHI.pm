@@ -53,6 +53,8 @@ sub cleanup {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 Plack::Session::Store::CHI - CHI session store
@@ -68,9 +70,17 @@ Plack::Session::Store::CHI - CHI session store
   };
 
   builder {
-      enable 'Session', store => Plack::Session::Store::CHI->new(chi => CHI->new(driver => 'FastMmap'));
+      enable 'Session',
+          store => Plack::Session::Store::CHI->new(
+              chi => CHI->new(driver => 'FastMmap')
+          );
       $app;
   };
+
+=head1 DESCRIPTION
+
+This is a subclass of L<Plack::Session::Store> and implements
+it's full interface.
 
 =head1 METHODS
 
@@ -78,23 +88,19 @@ Plack::Session::Store::CHI - CHI session store
 
 =item B<new ( %params )>
 
-=back
+The constructor expects an the I<chi> param to be an
+instance of L<CHI::Driver>, it will throw an exception
+if that is not the case.
 
-=over 4
-
-=item B<fetch ( $session_id, $key )>
-
-=item B<store ( $session_id, $key, $data )>
-
-=item B<delete ( $session_id, $key )>
+=item B<chi>
 
 =back
 
-=over 4
+=head1 BUGS
 
-=item B<cleanup ( $session_id )>
-
-=back
+All complex software has bugs lurking in it, and this module is no
+exception. If you find a bug please either email me, or add the bug
+to cpan-RT.
 
 =head1 AUTHOR
 

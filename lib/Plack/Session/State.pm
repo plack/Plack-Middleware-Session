@@ -79,27 +79,68 @@ Plack::Session::State - Basic parameter-based session state
 
 =item B<session_key>
 
+This is the name of the session key, it default to 'plack_session'.
+
 =item B<sid_generator>
 
+This is a CODE ref used to generate unique session ids.
+
 =back
+
+=head2 Session ID Managment
 
 =over 4
 
 =item B<get_session_id ( $request )>
 
+Given a C<$request> this will first attempt to extract the session,
+if the is expired or does not exist, it will then generate a new
+session. The C<$request> is expected to be a L<Plack::Request> instance
+or an object with an equivalent interface.
+
 =item B<extract ( $request )>
+
+This will attempt to extract the session from a C<$request> by looking
+for the C<session_key> in the C<$request> params. It will then check to
+see if the session has expired and return the session id if it is not.
+The C<$request> is expected to be a L<Plack::Request> instance or an
+object with an equivalent interface.
 
 =item B<generate ( $request )>
 
+This will generate a new session id using the C<sid_generator> callback.
+The C<$request> argument is not used by this method but is there for
+use by subclasses. The C<$request> is expected to be a L<Plack::Request>
+instance or an object with an equivalent interface.
+
 =item B<finalize ( $session_id, $response )>
 
+Given a C<$session_id> and a C<$response> this will perform any
+finalization nessecary to preserve state. This method is called by
+the L<Plack::Session> C<finalize> method. The C<$response> is expected
+to be a L<Plack::Response> instance or an object with an equivalent
+interface.
+
 =back
+
+=head2 Session Expiration Handling
 
 =over 4
 
 =item B<expire_session_id ( $id )>
 
+This will mark the session for C<$id> as expired. This method is called
+by the L<Plack::Session> C<expire> method.
+
+=item B<is_session_expired ( $id )>
+
+This will check to see if the session C<$id> has been marked as
+expired.
+
 =item B<check_expired ( $id )>
+
+Given an session C<$id> this will return C<undef> if the session is
+expired or return the C<$id> if it is not.
 
 =back
 
