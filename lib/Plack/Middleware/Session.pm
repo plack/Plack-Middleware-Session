@@ -27,7 +27,7 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    $env->{'psgix.session'} = Plack::Session->new(
+    $env->{'plack.session'} = Plack::Session->new(
         state   => $self->state,
         store   => $self->store,
         request => Plack::Request->new( $env )
@@ -36,7 +36,7 @@ sub call {
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $env->{'psgix.session'}->finalize( $res );
+        $env->{'plack.session'}->finalize( $res );
         @{$_[0]} = @{$res->finalize};
     });
 }
