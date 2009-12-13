@@ -17,9 +17,14 @@ sub expire_session_id {
     $self->expires( 0 );
 }
 
+sub get_request_session_id {
+    my ($self, $request ) = @_;
+    ($request->cookie( $self->session_key ) || return )->value;
+}
+
 sub extract {
     my ($self, $request) = @_;
-    $self->check_expired( ( $request->cookie( $self->session_key ) || return )->value );
+    $self->check_expired( $self->get_request_session_id($request) || return );
 }
 
 sub finalize {

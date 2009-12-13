@@ -37,6 +37,6 @@ t::lib::TestSession::run_all_tests(
     },
 );
 
-unlink $_ foreach glob( File::Spec->catdir($TMP, '*') );
+#unlink $_ foreach glob( File::Spec->catdir($TMP, '*') );
 
 done_testing;

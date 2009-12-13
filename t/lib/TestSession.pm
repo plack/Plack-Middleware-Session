@@ -227,6 +227,36 @@ sub run_all_tests {
 
         $response_test->( $resp, $sids[1] );
     }
+
+    {
+        # wrong format session_id
+        my $r = $request_creator->({ plack_session => '../wrong' });
+
+        my $s = Plack::Session->new(
+            state   => $state,
+            store   => $storage,
+            request => $r,
+        );
+
+
+        isnt('../wrong' => $s->id, '... regenerate session id');
+
+        ok(!$s->get('foo'), '... no value stored for foo in session');
+
+        lives_ok {
+            $s->set( foo => 'baz' );
+        } '... set the value successfully';
+
+        is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
+
+        my $resp = $r->new_response;
+
+        lives_ok {
+            $s->finalize( $resp );
+        } '... finalized session successfully';
+
+        $response_test->( $resp, $s );
+    }
 }
 
 1;

@@ -7,6 +7,7 @@ use Digest::SHA1 ();
 use Plack::Util::Accessor qw[
     session_key
     sid_generator
+    sid_checker
 ];
 
 sub new {
@@ -17,6 +18,7 @@ sub new {
     $params{'sid_generator'} ||= sub {
         Digest::SHA1::sha1_hex(rand() . $$ . {} . time)
     };
+    $params{'sid_checker'} ||= qr/\A[0-9a-f]{40}\Z/;
 
     bless { %params } => $class;
 }
@@ -37,16 +39,36 @@ sub check_expired {
     return $id;
 }
 
+sub check_request_session_id {
+    my ($self, $request) = @_;
+
+    my $reqest_session_id = $self->get_request_session_id($request);
+    my $sid_checker = $self->sid_checker;
+
+    defined $reqest_session_id && $reqest_session_id =~ m{$sid_checker};
+}
+
 sub get_session_id {
     my ($self, $request) = @_;
-    $self->extract( $request )
+    (
+        $self->check_request_session_id($request)
+        &&
+        $self->extract( $request )
+    )
         ||
     $self->generate( $request )
 }
 
+sub get_request_session_id {
+    my ($self, $request ) = @_;
+
+    $request->param( $self->session_key );
+}
+
 sub extract {
     my ($self, $request) = @_;
-    $self->check_expired( $request->param( $self->session_key ) );
+
+    $self->check_expired( $self->get_request_session_id($request) );
 }
 
 sub generate {
@@ -104,7 +126,7 @@ L<Plack::Session::State::Cookie> for an example of this.
 
 =item B<new ( %params )>
 
-The C<%params> can include I<session_key> and I<sid_generator>,
+The C<%params> can include I<session_key>, I<sid_generator> and I<sid_checker>
 however in both cases a default will be provided for you.
 
 =item B<session_key>
@@ -116,6 +138,10 @@ This is the name of the session key, it default to 'plack_session'.
 This is a CODE ref used to generate unique session ids, by default
 it will generate a SHA1 using fairly sufficient entropy. If you are
 concerned or interested, just read the source.
+
+=item B<sid_checker>
+
+This is a regex used to check requested session id,
 
 =back
 
