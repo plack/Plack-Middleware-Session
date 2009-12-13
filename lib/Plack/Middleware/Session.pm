@@ -10,12 +10,17 @@ use Scalar::Util;
 
 use parent 'Plack::Middleware';
 
-use Plack::Util::Accessor qw( state store );
+use Plack::Util::Accessor qw(
+    state
+    store
+    session_class
+);
 
 sub prepare_app {
     my $self = shift;
 
-    $self->state('Cookie') unless $self->state;
+    $self->session_class( 'Plack::Session' ) unless $self->session_class;
+    $self->state( 'Cookie' )                 unless $self->state;
 
     $self->state( $self->inflate_backend('Plack::Session::State', $self->state) );
     $self->store( $self->inflate_backend('Plack::Session::Store', $self->store) );
@@ -37,7 +42,7 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    $env->{'plack.session'} = Plack::Session->new(
+    $env->{'plack.session'} = $self->session_class->new(
         state   => $self->state,
         store   => $self->store,
         request => Plack::Request->new( $env )
