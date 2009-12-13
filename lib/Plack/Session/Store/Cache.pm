@@ -83,9 +83,9 @@ Plack::Session::Store::Cache - Cache session store
 
 =head1 DESCRIPTION
 
-This will persist session data using the L<Cache> module. This
-offers a lot of flexibility due to the many excellent L<CHI>
-drivers available.
+This will persist session data using any module which implements the
+L<Cache> interface. This offers a lot of flexibility due to the many
+excellent L<Cache>, L<Cache::Cache> and L<CHI> drivers available.
 
 This is a subclass of L<Plack::Session::Store> and implements
 it's full interface.
@@ -96,11 +96,13 @@ it's full interface.
 
 =item B<new ( %params )>
 
-The constructor expects an the I<cache> param to be an
-instance have get, set, and remove method, it will throw an exception
-if that is not the case.
+The constructor expects the I<cache> param to be an object instance
+which has the I<get>, I<set>, and I<remove> methods, it will throw an
+exception if that is not the case.
 
 =item B<cache>
+
+A simple accessor for the cache handle.
 
 =back
 
