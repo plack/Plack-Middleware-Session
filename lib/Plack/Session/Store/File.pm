@@ -82,7 +82,45 @@ __END__
 
 Plack::Session::Store::File - Basic file-based session store
 
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+  use Plack::Session::Store::File;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::File->new(
+              dir => '/path/to/sessions'
+          );
+      $app;
+  };
+
+  # with custom serializer/deserializer
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::File->new(
+              dir          => '/path/to/sessions',
+              # YAML takes it's args the opposite order
+              serializer   => sub { YAML::DumpFile( reverse @_ ) },
+              deserializer => sub { YAML::LoadFile( @_ ) },
+          );
+      $app;
+  };
+
 =head1 DESCRIPTION
+
+This implements a basic file based storage for session data. By
+default it will use L<Storable> to serialize and deserialize the
+data, but this can be configured easily.
+
+This is a subclass of L<Plack::Session::Store> and implements
+it's full interface.
 
 =head1 METHODS
 
@@ -90,11 +128,27 @@ Plack::Session::Store::File - Basic file-based session store
 
 =item B<new ( %params )>
 
+The C<%params> can include I<dir>, I<serializer> and I<deserializer>
+options. It will check to be sure that the I<dir> is writeable for
+you.
+
 =item B<dir>
+
+This is the directory to store the session data files in, if nothing
+is provided then "/tmp" is used.
 
 =item B<serializer>
 
+This is a CORE reference that implements the serialization logic.
+The CODE ref gets two arguments, the C<$value>, which is a HASH
+reference to be serialized, and the C<$file_path> to save it to.
+It is not expected to return anything.
+
 =item B<deserializer>
+
+This is a CORE reference that implements the deserialization logic.
+The CODE ref gets one argument, the C<$file_path> to load the data
+from. It is expected to return a HASH reference.
 
 =back
 

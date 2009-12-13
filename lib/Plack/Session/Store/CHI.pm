@@ -79,6 +79,10 @@ Plack::Session::Store::CHI - CHI session store
 
 =head1 DESCRIPTION
 
+This will persist session data using the L<CHI> module. This
+offers a lot of flexibility due to the many excellent L<CHI>
+drivers available.
+
 This is a subclass of L<Plack::Session::Store> and implements
 it's full interface.
 

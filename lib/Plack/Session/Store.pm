@@ -45,7 +45,32 @@ __END__
 
 Plack::Session::Store - Basic in-memory session store
 
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+  use Plack::Session::Store;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session'; # this is the defalt store
+      $app;
+  };
+
 =head1 DESCRIPTION
+
+This is a very basic in-memory session data store. It is volatile
+storage and not recommended for multiprocessing environments. However
+it is very useful for development and testing.
+
+This should be considered the store "base" class (although
+subclassing is not a requirement) and defines the spec for
+all B<Plack::Session::Store::*> modules. You will only
+need to override a couple methods if you do subclass. See
+the other B<Plack::Session::Store::*> for examples of this.
 
 =head1 METHODS
 
@@ -53,9 +78,14 @@ Plack::Session::Store - Basic in-memory session store
 
 =item B<new ( %params )>
 
+No parameters are expected to this constructor.
+
 =back
 
 =head2 Session Data Management
+
+These methods fetch data from the session storage. It can only fetch,
+store or delete a single key at a time.
 
 =over 4
 

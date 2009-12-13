@@ -60,7 +60,22 @@ Plack::Session - Middleware for session management
 
   use Plack::Session;
 
+  my $store = Plack::Session::Store->new;
+  my $state = Plack::Session::State->new;
+
+  my $s = Plack::Session->new(
+      store   => $store,
+      state   => $state,
+      request => Plack::Request->new( $env )
+  );
+
+  # ...
+
 =head1 DESCRIPTION
+
+This is the core session object, you probably want to look
+at L<Plack::Middlware::Session>, unless you are writing your
+own session middleware component.
 
 =head1 METHODS
 
@@ -91,7 +106,8 @@ an object with an equivalent interface.
 
 =head2 Session Data Storage
 
-These methods delegate to appropriate methods on the C<store>.
+These methods delegate to appropriate methods on the C<store>
+to manage your session data.
 
 =over 4
 

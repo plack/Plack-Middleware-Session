@@ -51,10 +51,25 @@ __END__
 
 Plack::Session::State::Cookie - Basic cookie-based session state
 
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session'; # Cookie is the default state
+      $app;
+  };
+
 =head1 DESCRIPTION
 
 This is a subclass of L<Plack::Session::State> and implements it's
-full interface.
+full interface. This is the default state used in
+L<Plack::Middleware::Session>.
 
 =head1 METHODS
 
@@ -62,13 +77,28 @@ full interface.
 
 =item B<new ( %params )>
 
+The C<%params> can include I<path>, I<domain>, I<expires> and
+I<secure> options, as well as all the options accepted by
+L<Plack::Session::Store>.
+
 =item B<path>
+
+Path of the cookie, this defaults to "/";
 
 =item B<domain>
 
+Domain of the cookie, if nothing is supplied then it will not
+be included in the cookie.
+
 =item B<expires>
 
+Expiration time of the cookie, if nothing is supplied then it will
+not be included in the cookie.
+
 =item B<secure>
+
+Secure flag for the cookie, if nothing is supplied then it will not
+be included in the cookie.
 
 =back
 

@@ -19,11 +19,30 @@ __END__
 
 Plack::Session::Store::Null - Null store
 
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+  use Plack::Session::Store::Null;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::Null->new;
+      $app;
+  };
+
 =head1 DESCRIPTION
 
 Sometimes you don't want to store anything in your sessions, but
 L<Plack::Session> requires a C<store> instance, so you can use this
 one and all methods will return null.
+
+This is a subclass of L<Plack::Session::Store> and implements
+it's full interface.
 
 =head1 BUGS
 

@@ -70,7 +70,33 @@ __END__
 
 Plack::Session::State - Basic parameter-based session state
 
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+  use Plack::Session::State;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session',
+          state => Plack::Session::State->new;
+      $app;
+  };
+
 =head1 DESCRIPTION
+
+This will maintain session state by passing the session through
+the request params. It does not do this automatically though,
+you are responsible for passing the session param.
+
+This should be considered the state "base" class (although
+subclassing is not a requirement) and defines the spec for
+all B<Plack::Session::State::*> modules. You will only
+need to override a couple methods if you do subclass. See
+L<Plack::Session::State::Cookie> for an example of this.
 
 =head1 METHODS
 
@@ -78,13 +104,18 @@ Plack::Session::State - Basic parameter-based session state
 
 =item B<new ( %params )>
 
+The C<%params> can include I<session_key> and I<sid_generator>,
+however in both cases a default will be provided for you.
+
 =item B<session_key>
 
 This is the name of the session key, it default to 'plack_session'.
 
 =item B<sid_generator>
 
-This is a CODE ref used to generate unique session ids.
+This is a CODE ref used to generate unique session ids, by default
+it will generate a SHA1 using fairly sufficient entropy. If you are
+concerned or interested, just read the source.
 
 =back
 

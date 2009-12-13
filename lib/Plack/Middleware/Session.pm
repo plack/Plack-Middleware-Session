@@ -53,9 +53,69 @@ Plack::Middleware::Session - Middleware for session management
 
 =head1 SYNOPSIS
 
+  use Plack::Builder;
   use Plack::Middleware::Session;
 
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session';
+      $app;
+  };
+
 =head1 DESCRIPTION
+
+This is a Plack Middleware component for session management. By
+default it will use cookies to keep session state and store data
+in memory. This distribution comes also comes with other state
+and store solutions.
+
+=head2 State
+
+=over 4
+
+=item L<Plack::Session::State>
+
+This will maintain session state by passing the session through
+the request params. It does not do this automatically though,
+you are responsible for passing the session param.
+
+=item L<Plack::Session::State::Cookie>
+
+This will maintain session state using browser cookies.
+
+=back
+
+=head2 Store
+
+=over 4
+
+=item L<Plack::Session::Store>
+
+This is your basic in-memory session data store. It is volatile storage
+and not recommended for multiprocessing environments. However it is
+very useful for development and testing.
+
+=item L<Plack::Session::Store::File>
+
+This will persist session data in a file. By default it uses
+L<Storable> but it can be configured to have a custom serializer and
+deserializer.
+
+=item L<Plack::Session::Store::CHI>
+
+This will persist session data using the L<CHI> module. This
+offers a lot of flexibility due to the many excellent L<CHI>
+drivers available.
+
+=item L<Plack::Session::Store::Null>
+
+Sometimes you don't care about storing session data, in that case
+you can use this noop module.
+
+=back
 
 =head1 BUGS
 
