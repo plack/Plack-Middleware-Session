@@ -120,11 +120,9 @@ This will persist session data in a file. By default it uses
 L<Storable> but it can be configured to have a custom serializer and
 deserializer.
 
-=item L<Plack::Session::Store::CHI>
+=item L<Plack::Session::Store::Cache>
 
-This will persist session data using the L<CHI> module. This
-offers a lot of flexibility due to the many excellent L<CHI>
-drivers available.
+This will persist session data using the L<Cache> interface.
 
 =item L<Plack::Session::Store::Null>
 
