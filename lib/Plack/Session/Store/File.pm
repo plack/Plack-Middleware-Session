@@ -71,6 +71,13 @@ sub _deserialize {
     $self->deserializer->( $file_path );
 }
 
+sub dump_session {
+    my ($self, $session_id) = @_;
+    my $file_path = $self->_get_session_file_path( $session_id );
+    return {} unless -f $file_path;
+    $self->deserializer->( $file_path );
+}
+
 
 1;
 

@@ -44,11 +44,21 @@ sub run_all_tests {
 
         is($s->get('foo'), 'bar', '... got the foo value back successfully from session');
 
+        ok(!$s->get('bar'), '... no value stored in foo for session');
+
+        lives_ok {
+            $s->set( bar => 'baz' );
+        } '... set the value successfully in session';
+
+        is($s->get('bar'), 'baz', '... got the foo value back successfully from session');
+
         my $resp = $r->new_response;
 
         lives_ok {
             $s->finalize( $resp );
         } '... finalized session successfully';
+
+        is_deeply( $s->store->dump_session( $sids[0] ), { foo => 'bar', bar => 'baz' }, '... got the session dump we expected');
 
         $response_test->( $resp, $sids[0] );
     }
@@ -79,6 +89,8 @@ sub run_all_tests {
             $s->finalize( $resp );
         } '... finalized session successfully';
 
+        is_deeply( $s->store->dump_session( $sids[1] ), { foo => 'baz' }, '... got the session dump we expected');
+
         $response_test->( $resp, $sids[1] );
     }
 
@@ -107,6 +119,8 @@ sub run_all_tests {
             $s->finalize( $resp );
         } '... finalized session successfully';
 
+        is_deeply( $s->store->dump_session( $sids[0] ), { bar => 'baz' }, '... got the session dump we expected');
+
         $response_test->( $resp, $sids[0] );
     }
 
@@ -130,6 +144,8 @@ sub run_all_tests {
             $s->finalize( $resp );
         } '... finalized session successfully';
 
+        is_deeply( $s->store->dump_session( $sids[1] ), { foo => 'baz' }, '... got the session dump we expected');
+
         $response_test->( $resp, $sids[1] );
     }
 
@@ -147,7 +163,7 @@ sub run_all_tests {
         ok(!$s->get('foo'), '... no value stored for foo in session');
 
         lives_ok {
-            $s->set( bar => 'baz' );
+            $s->set( baz => 'gorch' );
         } '... set the bar value successfully in session';
 
         my $resp = $r->new_response;
@@ -155,6 +171,8 @@ sub run_all_tests {
         lives_ok {
             $s->finalize( $resp );
         } '... finalized session successfully';
+
+        is_deeply( $s->store->dump_session( $sids[0] ), { bar => 'baz', baz => 'gorch' }, '... got the session dump we expected');
 
         $response_test->( $resp, $sids[0] );
     }
@@ -180,6 +198,8 @@ sub run_all_tests {
             $s->finalize( $resp );
         } '... finalized session successfully';
 
+        is_deeply( $s->store->dump_session( $sids[0] ), {}, '... got the session dump we expected');
+
         $response_test->( $resp, $sids[0], 1 );
     }
 
@@ -203,6 +223,8 @@ sub run_all_tests {
             $s->finalize( $resp );
         } '... finalized session successfully';
 
+        is_deeply( $s->store->dump_session( $sids[2] ), {}, '... got the session dump we expected');
+
         $response_test->( $resp, $sids[2] );
     }
 
@@ -224,6 +246,8 @@ sub run_all_tests {
         lives_ok {
             $s->finalize( $resp );
         } '... finalized session successfully';
+
+        is_deeply( $s->store->dump_session( $sids[1] ), { foo => 'baz' }, '... got the session dump we expected');
 
         $response_test->( $resp, $sids[1] );
     }
@@ -254,6 +278,8 @@ sub run_all_tests {
         lives_ok {
             $s->finalize( $resp );
         } '... finalized session successfully';
+
+        is_deeply( $s->store->dump_session( $s->id ), { foo => 'baz' }, '... got the session dump we expected');
 
         $response_test->( $resp, $s );
     }

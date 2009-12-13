@@ -53,6 +53,11 @@ sub cleanup {
     $self->cache->remove($session_id);
 }
 
+sub dump_session {
+    my ($self, $session_id) = @_;
+    $self->cache->get( $session_id ) || {};
+}
+
 1;
 
 __END__

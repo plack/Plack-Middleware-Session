@@ -35,6 +35,11 @@ sub persist {
     ()
 }
 
+sub dump_session {
+    my ($self, $session_id) = @_;
+    $self->_stash->{ $session_id } || {};
+}
+
 1;
 
 __END__
@@ -112,6 +117,12 @@ instance or an object with an equivalent interface.
 
 This method is called by the L<Plack::Session> C<expire> method and
 is used to remove any session data.
+
+=item B<dump_session ( $session_id )>
+
+This method is mostly for debugging purposes, it will always return
+a HASH ref, even if no data is actually being stored (in which case
+the HASH ref will be empty).
 
 =back
 

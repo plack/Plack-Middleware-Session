@@ -9,6 +9,8 @@ sub delete  {}
 sub cleanup {}
 sub persist {}
 
+sub dump_session { +{} }
+
 1;
 
 __END__
