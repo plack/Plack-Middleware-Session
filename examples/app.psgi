@@ -13,7 +13,7 @@ my $app = Plack::Middleware::Session->wrap(
 
         return [ 404, [], [] ] if $r->path_info =~ /favicon.ico/;
 
-        my $session = $env->{'psgix.session'};
+        my $session = $env->{'plack.session'};
 
         my $id      = $session->id;
         my $counter = $session->get('counter') || 0;
