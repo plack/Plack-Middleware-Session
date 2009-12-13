@@ -54,7 +54,6 @@ Plack::Middleware::Session - Middleware for session management
 =head1 SYNOPSIS
 
   use Plack::Builder;
-  use Plack::Middleware::Session;
 
   my $app = sub {
       return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];

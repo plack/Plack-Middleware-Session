@@ -15,7 +15,7 @@ use Plack::Util::Accessor qw[
 sub new {
     my ($class, %params) = @_;
 
-    $params{'dir'} ||= '/tmp';
+    $params{'dir'} ||= $ENV{TMPDIR} || '/tmp';
 
     die "Storage directory (" . $params{'dir'} . ") is not writeable"
         unless -w $params{'dir'};
