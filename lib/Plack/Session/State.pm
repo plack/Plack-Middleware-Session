@@ -43,9 +43,8 @@ sub validate_request_session_id {
     my ($self, $request) = @_;
 
     my $reqest_session_id = $self->get_request_session_id($request);
-    my $sid_validator = $self->sid_validator;
 
-    defined $reqest_session_id && $reqest_session_id =~ m{$sid_validator};
+    defined $reqest_session_id && $reqest_session_id =~ $self->sid_validator;
 }
 
 sub get_session_id {
