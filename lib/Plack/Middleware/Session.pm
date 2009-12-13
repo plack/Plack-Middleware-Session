@@ -5,8 +5,8 @@ use warnings;
 use Plack::Session;
 use Plack::Request;
 use Plack::Response;
-use Plack::Session::State::Cookie;
-use Plack::Session::Store;
+use Plack::Util;
+use Scalar::Util;
 
 use parent 'Plack::Middleware';
 
@@ -14,13 +14,23 @@ use Plack::Util::Accessor qw( state store );
 
 sub prepare_app {
     my $self = shift;
-    unless ($self->state) {
-        $self->state( Plack::Session::State::Cookie->new );
-    }
 
-    unless ($self->store) {
-        $self->store( Plack::Session::Store->new );
-    }
+    $self->state('Cookie') unless $self->state;
+
+    $self->state( $self->inflate_backend('Plack::Session::State', $self->state) );
+    $self->store( $self->inflate_backend('Plack::Session::Store', $self->store) );
+}
+
+sub inflate_backend {
+    my($self, $prefix, $backend) = @_;
+
+    return $backend if defined $backend && Scalar::Util::blessed $backend;
+
+    my @class;
+    push @class, $backend if defined $backend; # undef means the root class
+    push @class, $prefix;
+
+    Plack::Util::load_class(@class)->new();
 }
 
 sub call {
@@ -64,12 +74,19 @@ Plack::Middleware::Session - Middleware for session management
       $app;
   };
 
+  # Or, use the File store backend (great if you use multiprocess server)
+  # For more options, see perldoc Plack::Session::Store::File
+  builder {
+      enable 'Session', store => 'File';
+      $app;
+  };
+
 =head1 DESCRIPTION
 
 This is a Plack Middleware component for session management. By
-default it will use cookies to keep session state and store data
-in memory. This distribution comes also comes with other state
-and store solutions.
+default it will use cookies to keep session state and store data in
+memory. This distribution also comes with other state and store
+solutions. See perldoc for these backends how to use them.
 
 =head2 State
 
