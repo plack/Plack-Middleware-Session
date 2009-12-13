@@ -3,13 +3,9 @@
 use strict;
 use warnings;
 use File::Spec;
+use Test::Requires 'YAML';
 
 use Test::More;
-
-BEGIN {
-    eval "use YAML";
-    plan skip_all => "This test requires YAML" if $@;
-}
 
 use Plack::Request;
 use Plack::Session;

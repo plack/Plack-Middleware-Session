@@ -23,12 +23,14 @@ sub new {
     $params{'serializer'}   ||= sub { Storable::nstore( @_ ) };
     $params{'deserializer'} ||= sub { Storable::retrieve( @_ ) };
 
-    $class->SUPER::new( %params );
+    bless { %params } => $class;
 }
 
 sub fetch {
     my ($self, $session_id, $key) = @_;
-    $self->_deserialize( $session_id )->{ $key };
+    my $store = $self->_deserialize( $session_id );
+    return unless exists $store->{ $key };
+    return $store->{ $key };
 }
 
 sub store {
@@ -41,6 +43,7 @@ sub store {
 sub delete {
     my ($self, $session_id, $key) = @_;
     my $store = $self->_deserialize( $session_id );
+    return unless exists $store->{ $key };
     delete $store->{ $key };
     $self->_serialize( $session_id, $store );
 }
