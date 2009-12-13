@@ -167,9 +167,10 @@ C<$session_id> is valid.
 
 This will attempt to extract the session from a C<$request> by looking
 for the C<session_key> in the C<$request> params. It will then check to
-see if the session has expired and return the session id if it is not.
-The C<$request> is expected to be a L<Plack::Request> instance or an
-object with an equivalent interface.
+see if the session is valid and that it has not expired. It will return
+the session id if everything is good or undef otherwise. The C<$request>
+is expected to be a L<Plack::Request> instance or an object with an
+equivalent interface.
 
 =item B<generate ( $request )>
 
