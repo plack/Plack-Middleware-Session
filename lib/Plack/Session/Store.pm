@@ -2,6 +2,9 @@ package Plack::Session::Store;
 use strict;
 use warnings;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use Plack::Util::Accessor qw[ _stash ];
 
 sub new {

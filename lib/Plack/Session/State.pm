@@ -2,6 +2,9 @@ package Plack::Session::State;
 use strict;
 use warnings;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use Digest::SHA1 ();
 
 use Plack::Util::Accessor qw[

@@ -2,6 +2,9 @@ package Plack::Session::Store::Null;
 use strict;
 use warnings;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'cpan:STEVAN';
+
 sub new     { bless {} => shift }
 sub fetch   {}
 sub store   {}

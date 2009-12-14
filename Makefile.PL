@@ -8,7 +8,7 @@ license 'perl';
 
 # prereqs
 requires 'Plack'            => '0.9021';
-requires 'Plack::Request'   => '0.08';
+requires 'Plack::Request'   => '0.09';
 
 # for session ID gen
 requires 'Digest::SHA'      => '0';

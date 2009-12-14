@@ -2,6 +2,9 @@ package Plack::Middleware::Session;
 use strict;
 use warnings;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use Plack::Session;
 use Plack::Request;
 use Plack::Response;
@@ -133,6 +136,37 @@ This will persist session data using the L<Cache> interface.
 
 Sometimes you don't care about storing session data, in that case
 you can use this noop module.
+
+=back
+
+=head1 OPTIONS
+
+The following are options that can be passed to this mdoule.
+
+=over 4
+
+=item I<state>
+
+This is expected to be an instance of L<Plack::Session::State> or an
+object that implements the same interface. If no option is provided
+the default L<Plack::Session::State::Cookie> will be used.
+
+=item I<store>
+
+This is expected to be an instance of L<Plack::Session::Store> or an
+object that implements the same interface. If no option is provided
+the default L<Plack::Session::Store> will be used.
+
+It should be noted that this default is an in-memory volatile store
+is only suitable for development (or single process servers). For a
+more robust solution see L<Plack::Session::Store::File> or
+L<Plack::Session::Store::Cache>.
+
+=item I<session_class>
+
+This can be used to override the actual session class. It currently
+defaults to L<Plack::Session> but you can substitute any class which
+implements the same interface.
 
 =back
 

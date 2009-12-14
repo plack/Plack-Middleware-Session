@@ -2,6 +2,9 @@ package Plack::Session::Store::File;
 use strict;
 use warnings;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use Storable ();
 
 use parent 'Plack::Session::Store';
