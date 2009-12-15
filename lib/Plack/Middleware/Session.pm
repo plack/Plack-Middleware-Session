@@ -74,7 +74,12 @@ Plack::Middleware::Session - Middleware for session management
   use Plack::Builder;
 
   my $app = sub {
-      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+      my $env = shift;
+      return [
+          200,
+          [ 'Content-Type' => 'text/plain' ],
+          [ 'Hello, your Session ID is ' . $env->{'plack.session'}->id ]
+      ];
   };
 
   builder {
@@ -95,6 +100,12 @@ This is a Plack Middleware component for session management. By
 default it will use cookies to keep session state and store data in
 memory. This distribution also comes with other state and store
 solutions. See perldoc for these backends how to use them.
+
+It should be noted that we store the current session in the
+C<plack.session> key inside the C<$env> where you can access it
+as needed. Additionally, as of version 0.09, you can call the
+C<session> method of a L<Plack::Request> instance to fetch
+whatever is stored in C<plack.session>.
 
 =head2 State
 
