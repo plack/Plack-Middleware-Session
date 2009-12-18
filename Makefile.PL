@@ -11,7 +11,7 @@ requires 'Plack'            => '0.9021';
 requires 'Plack::Request'   => '0.09';
 
 # for session ID gen
-requires 'Digest::SHA'      => '0';
+requires 'Digest::SHA1'      => '0';
 
 # things the tests need
 build_requires 'Test::More' => '0.88';
