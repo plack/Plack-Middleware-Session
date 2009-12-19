@@ -55,7 +55,9 @@ sub call {
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
         $env->{'plack.session'}->finalize( $res );
-        @{$_[0]} = @{$res->finalize};
+        $res = $res->finalize;
+        $_[0]->[0] = $res->[0];
+        $_[0]->[1] = $res->[1];
     });
 }
 
