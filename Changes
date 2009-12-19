@@ -1,4 +1,9 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.02 Sat. Dec. 19, 2009
+    - fixed dependency list (RT #52891) (Thanks to Andreas Koenig)
+    - fixed some POD misspellings (Thanks to franckcuny)
+    - fixed streaming interface (Thanks to clkao and miyagawa)
+
 0.01 Tues. Dec. 15, 2009
     - Hello CPAN World!

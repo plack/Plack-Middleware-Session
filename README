@@ -1,4 +1,4 @@
-Plack::Middleware::Session version 0.01
+Plack::Middleware::Session version 0.02
 ===========================
 
 See the individual module documentation for more information
@@ -18,7 +18,7 @@ This module requires these other modules and libraries:
 
     Plack
     Plack::Request
-    Digest::SHA
+    Digest::SHA1
 
 COPYRIGHT AND LICENCE
 
