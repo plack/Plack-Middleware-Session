@@ -23,8 +23,8 @@ sub new {
     die "Storage directory (" . $params{'dir'} . ") is not writeable"
         unless -w $params{'dir'};
 
-    $params{'serializer'}   ||= sub { Storable::nstore( @_ ) };
-    $params{'deserializer'} ||= sub { Storable::retrieve( @_ ) };
+    $params{'serializer'}   ||= sub { Storable::lock_nstore( @_ ) };
+    $params{'deserializer'} ||= sub { Storable::lock_retrieve( @_ ) };
 
     bless { %params } => $class;
 }
