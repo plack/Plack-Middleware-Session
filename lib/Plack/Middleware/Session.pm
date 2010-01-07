@@ -45,7 +45,7 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    $env->{'plack.session'} = $self->session_class->new(
+    $env->{'psgix.session'} = $env->{'plack.session'} = $self->session_class->new(
         state   => $self->state,
         store   => $self->store,
         request => Plack::Request->new( $env )
@@ -54,7 +54,7 @@ sub call {
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $env->{'plack.session'}->finalize( $res );
+        $env->{'psgix.session'}->finalize( $res );
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
@@ -80,7 +80,7 @@ Plack::Middleware::Session - Middleware for session management
       return [
           200,
           [ 'Content-Type' => 'text/plain' ],
-          [ 'Hello, your Session ID is ' . $env->{'plack.session'}->id ]
+          [ 'Hello, your Session ID is ' . $env->{'psgix.session'}->id ]
       ];
   };
 
@@ -104,10 +104,15 @@ memory. This distribution also comes with other state and store
 solutions. See perldoc for these backends how to use them.
 
 It should be noted that we store the current session in the
-C<plack.session> key inside the C<$env> where you can access it
+C<psgix.session> key inside the C<$env> where you can access it
 as needed. Additionally, as of version 0.09, you can call the
 C<session> method of a L<Plack::Request> instance to fetch
-whatever is stored in C<plack.session>.
+whatever is stored in C<psgix.session>.
+
+B<NOTE:> As of version 0.02 the session is stored in C<psgix.session>
+instead of C<plack.session>. We still keep a copy of it in
+C<plack.session>, but this is deprecated and will be removed
+in future versions.
 
 =head2 State
 
