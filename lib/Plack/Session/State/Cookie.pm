@@ -2,7 +2,7 @@ package Plack::Session::State::Cookie;
 use strict;
 use warnings;
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use parent 'Plack::Session::State';
@@ -117,7 +117,7 @@ Stevan Little E<lt>stevan.little@iinteractive.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 Infinity Interactive, Inc.
+Copyright 2009, 2010 Infinity Interactive, Inc.
 
 L<http://www.iinteractive.com>
 

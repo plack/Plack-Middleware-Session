@@ -1,5 +1,15 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.03 Thurs. Jan. 7, 2009
+    * Plack::Middleware::Session
+      - change plack.session to psgix.session (plack.session is
+        retained for back-compat, but is deprecated and will be
+        removed in future versions)
+
+    * Plack::Session::Store::File
+      - changed to lock_* versions of the Storaable functions
+        (thanks to Miyagawa)
+
 0.02 Sat. Dec. 19, 2009
     - fixed dependency list (RT #52891) (Thanks to Andreas Koenig)
     - fixed some POD misspellings (Thanks to franckcuny)
