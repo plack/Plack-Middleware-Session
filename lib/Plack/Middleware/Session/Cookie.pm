@@ -32,13 +32,15 @@ sub get_session {
     my($time, $b64, $sig) = split /:/, $cookie, 3;
     $self->sig($b64) eq $sig or return;
 
+    # NOTE: do something with $time?
+
     my $session = Storable::thaw(MIME::Base64::decode($b64));
-    return ($time, $session);
+    return ($self->generate_id, $session);
 }
 
 sub generate_id {
     my $self = shift;
-    return Time::HiRes::gettimeofday;
+    return scalar Time::HiRes::gettimeofday;
 }
 
 sub commit { }
