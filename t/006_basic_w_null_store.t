@@ -10,9 +10,11 @@ use Plack::Request;
 use Plack::Session;
 use Plack::Session::State;
 use Plack::Session::Store::Null;
+use Plack::Middleware::Session;
 
 my $storage         = Plack::Session::Store::Null->new;
 my $state           = Plack::Session::State->new;
+my $m               = Plack::Middleware::Session->new(store => $storage, state => $state);
 my $request_creator = sub {
     open my $in, '<', \do { my $d };
     my $env = {
@@ -31,11 +33,7 @@ my $request_creator = sub {
 {
     my $r = $request_creator->();
 
-    my $s = Plack::Session->new(
-        state   => $state,
-        store   => $storage,
-        request => $r,
-    );
+    my $s = Plack::Session->fetch_or_create($r, $m);
 
     ok($s->id, '... got a session id');
 
@@ -45,7 +43,7 @@ my $request_creator = sub {
         $s->set( foo => 'bar' );
     } '... set the value successfully in session';
 
-    ok(!$s->get('foo'), '... still no value stored in foo for session (null store)');
+    is($s->get('foo'), 'bar', 'No store, but session works in the session lifetime');
 
     lives_ok {
         $s->remove('foo');

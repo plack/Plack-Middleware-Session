@@ -5,48 +5,66 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Util::Accessor qw[
-    id
-    store
-    state
-];
+use Plack::Util::Accessor qw( id is_new manager );
+
+sub fetch_or_create {
+    my($class, $request, $manager) = @_;
+
+    my $id = $manager->state->extract($request);
+    if ($id) {
+        my $store = $manager->store->fetch($id);
+        return $class->new( id => $id, _stash => $store, manager => $manager );
+    } else {
+        $id = $manager->state->generate($request);
+        return $class->new( id => $id, _stash => {}, manager => $manager, is_new => 1 );
+    }
+}
 
 sub new {
     my ($class, %params) = @_;
-    my $request = delete $params{'request'};
-    $params{'id'} = $params{'state'}->get_session_id( $request );
     bless { %params } => $class;
 }
 
 ## Data Managment
 
+sub dump {
+    my $self = shift;
+    $self->{_stash};
+}
+
 sub get {
     my ($self, $key) = @_;
-    $self->store->fetch( $self->id, $key )
+    $self->{_stash}{$key};
 }
 
 sub set {
     my ($self, $key, $value) = @_;
-    $self->store->store( $self->id, $key, $value );
+    $self->{_stash}{$key} = $value;
 }
 
 sub remove {
     my ($self, $key) = @_;
-    $self->store->delete( $self->id, $key );
+    delete $self->{_stash}{$key};
+}
+
+sub keys {
+    my $self = shift;
+    keys %{$self->{_stash}};
 }
 
 ## Lifecycle Management
 
 sub expire {
     my $self = shift;
-    $self->store->cleanup( $self->id );
-    $self->state->expire_session_id( $self->id );
+    $self->{_stash} = {};
+    $self->manager->store->cleanup( $self->id );
+    $self->manager->state->expire_session_id( $self->id );
 }
 
 sub finalize {
     my ($self, $response) = @_;
-    $self->store->persist( $self->id, $response );
-    $self->state->finalize( $self->id, $response );
+    $self->manager->store->store( $self->id, $self );
+    $self->manager->state->finalize( $self->id, $response );
 }
 
 1;
@@ -107,10 +125,11 @@ an object with an equivalent interface.
 
 =back
 
-=head2 Session Data Storage
+=head2 Session Data Management
 
-These methods delegate to appropriate methods on the C<store>
-to manage your session data.
+These methods allows you to read and write the session data like
+Perl's normal hash. The operation is not synced to the storage until
+you call C<finalize> on it.
 
 =over 4
 
@@ -119,6 +138,8 @@ to manage your session data.
 =item B<set ( $key, $value )>
 
 =item B<remove ( $key )>
+
+=item B<keys>
 
 =back
 
@@ -136,7 +157,7 @@ the C<$response>.
 =item B<finalize ( $response )>
 
 This method should be called at the end of the response cycle. It
-will call the C<persist> method on the C<store> and the
+will call the C<store> method on the C<store> and the
 C<expire_session_id> method on the C<state>, passing both of them
 the session id. The C<$response> is expected to be a L<Plack::Response>
 instance or an object with an equivalent interface.

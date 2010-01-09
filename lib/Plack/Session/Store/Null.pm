@@ -8,11 +8,7 @@ our $AUTHORITY = 'cpan:STEVAN';
 sub new     { bless {} => shift }
 sub fetch   {}
 sub store   {}
-sub delete  {}
 sub cleanup {}
-sub persist {}
-
-sub dump_session { +{} }
 
 1;
 

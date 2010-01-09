@@ -49,20 +49,13 @@ sub validate_session_id {
 
 sub get_session_id {
     my ($self, $request) = @_;
-    $self->extract( $request )
-        ||
-    $self->generate( $request )
-}
-
-sub get_session_id_from_request {
-    my ($self, $request) = @_;
-    $request->param( $self->session_key );
+    return $request->param( $self->session_key );
 }
 
 sub extract {
     my ($self, $request) = @_;
 
-    my $id = $self->get_session_id_from_request( $request );
+    my $id = $self->get_session_id( $request );
     return unless defined $id;
 
     $self->validate_session_id( $id )
@@ -149,13 +142,6 @@ This is a regex used to validate requested session id.
 =over 4
 
 =item B<get_session_id ( $request )>
-
-Given a C<$request> this will first attempt to extract the session,
-if the is expired or does not exist, it will then generate a new
-session. The C<$request> is expected to be a L<Plack::Request> instance
-or an object with an equivalent interface.
-
-=item B<get_session_id_from_request ( $request )>
 
 This is the method used to extract the session id from a C<$request>.
 Subclasses will often only need to override this method and the

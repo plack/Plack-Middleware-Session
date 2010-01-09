@@ -24,41 +24,18 @@ sub new {
 }
 
 sub fetch {
-    my ($self, $session_id, $key) = @_;
-    my $cache = $self->cache->get($session_id);
-    return unless $cache;
-    return $cache->{ $key };
+    my ($self, $session_id ) = @_;
+    $self->cache->get($session_id);
 }
 
 sub store {
-    my ($self, $session_id, $key, $data) = @_;
-    my $cache = $self->cache->get($session_id);
-    if ( !$cache ) {
-        $cache = {$key => $data};
-    }
-    else {
-        $cache->{$key} = $data;
-    }
-    $self->cache->set($session_id => $cache);
-}
-
-sub delete {
-    my ($self, $session_id, $key) = @_;
-    my $cache = $self->cache->get($session_id);
-    return unless exists $cache->{$key};
-
-    delete $cache->{ $key };
-    $self->cache->set($session_id => $cache);
+    my ($self, $session_id, $session) = @_;
+    $self->cache->set($session_id => $session->dump);
 }
 
 sub cleanup {
     my ($self, $session_id) = @_;
     $self->cache->remove($session_id);
-}
-
-sub dump_session {
-    my ($self, $session_id) = @_;
-    $self->cache->get( $session_id ) || {};
 }
 
 1;

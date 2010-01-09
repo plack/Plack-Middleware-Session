@@ -20,7 +20,7 @@ sub expire_session_id {
     $self->expires( 0 );
 }
 
-sub get_session_id_from_request {
+sub get_session_id {
     my ($self, $request) = @_;
     ( $request->cookie( $self->session_key ) || return )->value;
 }

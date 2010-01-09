@@ -14,33 +14,18 @@ sub new {
 }
 
 sub fetch {
-    my ($self, $session_id, $key) = @_;
-    $self->_stash->{ $session_id }->{ $key }
+    my ($self, $session_id) = @_;
+    $self->_stash->{ $session_id };
 }
 
 sub store {
-    my ($self, $session_id, $key, $data) = @_;
-    $self->_stash->{ $session_id }->{ $key } = $data;
-}
-
-sub delete {
-    my ($self, $session_id, $key) = @_;
-    delete $self->_stash->{ $session_id }->{ $key };
+    my ($self, $session_id, $session) = @_;
+    $self->_stash->{ $session_id } = $session->dump;
 }
 
 sub cleanup {
     my ($self, $session_id) = @_;
     delete $self->_stash->{ $session_id }
-}
-
-sub persist {
-    my ($self, $session_id, $response) = @_;
-    ()
-}
-
-sub dump_session {
-    my ($self, $session_id) = @_;
-    $self->_stash->{ $session_id } || {};
 }
 
 1;
@@ -92,16 +77,14 @@ No parameters are expected to this constructor.
 
 =head2 Session Data Management
 
-These methods fetch data from the session storage. It can only fetch,
-store or delete a single key at a time.
+These methods fetch data from the session storage. It's designed to
+store or delete multiple keys at a time.
 
 =over 4
 
-=item B<fetch ( $session_id, $key )>
+=item B<fetch ( $session_id )>
 
-=item B<store ( $session_id, $key, $data )>
-
-=item B<delete ( $session_id, $key )>
+=item B<store ( $session_id, $data )>
 
 =back
 
@@ -109,23 +92,10 @@ store or delete a single key at a time.
 
 =over 4
 
-=item B<persist ( $session_id, $response )>
-
-This method will perform any data persistence nessecary to maintain
-data across requests. This method is called by the L<Plack::Session>
-C<finalize> method. The C<$response> is expected to be a L<Plack::Response>
-instance or an object with an equivalent interface.
-
 =item B<cleanup ( $session_id )>
 
 This method is called by the L<Plack::Session> C<expire> method and
 is used to remove any session data.
-
-=item B<dump_session ( $session_id )>
-
-This method is mostly for debugging purposes, it will always return
-a HASH ref, even if no data is actually being stored (in which case
-the HASH ref will be empty).
 
 =back
 

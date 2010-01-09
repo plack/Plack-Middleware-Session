@@ -45,11 +45,9 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    $env->{'psgix.session'} = $env->{'plack.session'} = $self->session_class->new(
-        state   => $self->state,
-        store   => $self->store,
-        request => Plack::Request->new( $env )
-    );
+    my $session = $self->session_class->fetch_or_create( Plack::Request->new($env), $self );
+
+    $env->{'psgix.session'} = $env->{'plack.session'} = $session;
 
     my $res = $self->app->($env);
     $self->response_cb($res, sub {

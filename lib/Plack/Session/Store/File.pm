@@ -30,25 +30,13 @@ sub new {
 }
 
 sub fetch {
-    my ($self, $session_id, $key) = @_;
-    my $store = $self->_deserialize( $session_id );
-    return unless exists $store->{ $key };
-    return $store->{ $key };
+    my ($self, $session_id) = @_;
+    return $self->_deserialize( $session_id );
 }
 
 sub store {
-    my ($self, $session_id, $key, $data) = @_;
-    my $store = $self->_deserialize( $session_id );
-    $store->{ $key } = $data;
-    $self->_serialize( $session_id, $store );
-}
-
-sub delete {
-    my ($self, $session_id, $key) = @_;
-    my $store = $self->_deserialize( $session_id );
-    return unless exists $store->{ $key };
-    delete $store->{ $key };
-    $self->_serialize( $session_id, $store );
+    my ($self, $session_id, $session) = @_;
+    $self->_serialize( $session_id, $session->dump );
 }
 
 sub cleanup {
@@ -73,14 +61,6 @@ sub _deserialize {
     $self->_serialize( $session_id, {} ) unless -f $file_path;
     $self->deserializer->( $file_path );
 }
-
-sub dump_session {
-    my ($self, $session_id) = @_;
-    my $file_path = $self->_get_session_file_path( $session_id );
-    return {} unless -f $file_path;
-    $self->deserializer->( $file_path );
-}
-
 
 1;
 
