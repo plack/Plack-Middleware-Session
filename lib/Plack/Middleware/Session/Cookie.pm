@@ -50,13 +50,13 @@ sub prepare_app {
 }
 
 sub finalize {
-    my($self, $env, $response) = @_;
+    my($self, $session, $options, $response) = @_;
 
-    if ($env->{'psgix.session.options'}->{expire}) {
-        $self->state->expire_session_id($env->{'psgix.session.options'}->{id}, $response);
+    if ($options->{expire}) {
+        $self->state->expire_session_id($options->{id}, $response);
     } else {
-        my $cookie = $self->_serialize($env->{'psgix.session'});
-        $self->state->finalize($cookie, $response, $env->{'psgix.session.options'});
+        my $cookie = $self->_serialize($session);
+        $self->state->finalize($cookie, $response, $options);
     }
 }
 

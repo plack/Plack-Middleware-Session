@@ -68,7 +68,7 @@ sub call {
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $self->finalize($env, $res);
+        $self->finalize($env->{'psgix.session'}, $env->{'psgix.session.options'}, $res);
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
@@ -85,13 +85,13 @@ sub commit {
 }
 
 sub finalize {
-    my($self, $env, $response) = @_;
+    my($self, $session, $options, $response) = @_;
 
-    $self->commit($env->{'psgix.session'}, $env->{'psgix.session.options'});
-    if ($env->{'psgix.session.options'}->{expire}) {
-        $self->state->expire_session_id($env->{'psgix.session.options'}->{id}, $response);
+    $self->commit($session, $options);
+    if ($options->{expire}) {
+        $self->state->expire_session_id($options->{id}, $response);
     } else {
-        $self->state->finalize($env->{'psgix.session.options'}->{id}, $response, $env->{'psgix.session.options'});
+        $self->state->finalize($options->{id}, $response, $options);
     }
 }
 
