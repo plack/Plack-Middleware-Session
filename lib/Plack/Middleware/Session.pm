@@ -46,12 +46,11 @@ sub call {
 
     my $request = Plack::Request->new($env);
 
-    my($id, $session);
-    if ($id = $self->state->extract($request) and
-        $session = $self->store->fetch($id)) {
+    my($id, $session) = $self->get_session($request);
+    if ($id && $session) {
         $env->{'psgix.session'} = $session;
     } else {
-        $id = $self->state->generate($request);
+        $id = $self->generate_id($request);
         $env->{'psgix.session'} = {};
     }
 
@@ -64,11 +63,25 @@ sub call {
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $self->finalize($env->{'psgix.session'}, $env->{'psgix.session.options'}, $res);
+        $self->finalize($request, $res);
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
     });
+}
+
+sub get_session {
+    my($self, $request) = @_;
+
+    my $id = $self->state->extract($request) or return;
+    my $session = $self->store->fetch($id)   or return;
+
+    return ($id, $session);
+}
+
+sub generate_id {
+    my($self, $request) = @_;
+    $self->state->generate($request);
 }
 
 sub commit {
@@ -81,14 +94,27 @@ sub commit {
 }
 
 sub finalize {
-    my($self, $session, $options, $response) = @_;
+    my($self, $request, $response) = @_;
+
+    my $session = $request->env->{'psgix.session'};
+    my $options = $request->env->{'psgix.session.options'};
 
     $self->commit($session, $options) unless $options->{no_store};
     if ($options->{expire}) {
-        $self->state->expire_session_id($options->{id}, $response);
+        $self->expire_session($options->{id}, $response, $session, $options);
     } else {
-        $self->state->finalize($options->{id}, $response, $options);
+        $self->save_state($options->{id}, $response, $session, $options);
     }
+}
+
+sub expire_session {
+    my($self, $id, $res, $session, $options) = @_;
+    $self->state->expire_session_id($options->{id}, $res, $options);
+}
+
+sub save_state {
+    my($self, $id, $res, $session, $options) = @_;
+    $self->state->finalize($id, $res, $options);
 }
 
 1;

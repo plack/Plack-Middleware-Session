@@ -18,54 +18,43 @@ sub prepare_app {
     Plack::Util::load_class($self->session_class) if $self->session_class;
     $self->session_key("plack_session") unless $self->session_key;
 
-    my $state_cookie = Plack::Session::State::Cookie->new;
+    $self->state( Plack::Session::State::Cookie->new );
     for my $attr (qw(session_key path domain expires secure)) {
-        $state_cookie->$attr($self->$attr);
+        $self->state->$attr($self->$attr);
     }
-
-    my $state = Plack::Util::inline_object
-        generate => sub { $self->_serialize({}) },
-        extract  => sub {
-            my $cookie = $state_cookie->get_session_id(@_) or return;
-
-            my($time, $b64, $sig) = split /:/, $cookie, 3;
-            $self->sig($b64) eq $sig or return;
-
-            return $cookie;
-        },
-        expire_session_id => sub { $state_cookie->expire_session_id(@_) },
-        finalize => sub { $state_cookie->finalize(@_) };
-
-    my $store = Plack::Util::inline_object
-        fetch => sub {
-            my $id = shift;
-            my($time, $b64, $sig) = split /:/, $id, 3;
-            Storable::thaw(MIME::Base64::decode($b64));
-        },
-        store => sub { },
-        cleanup => sub { };
-
-    $self->state($state);
-    $self->store($store);
 }
 
-sub finalize {
-    my($self, $session, $options, $response) = @_;
+sub get_session {
+    my($self, $request) = @_;
 
-    if ($options->{expire}) {
-        $self->state->expire_session_id($options->{id}, $response);
-    } else {
-        my $cookie = $self->_serialize($session);
-        $self->state->finalize($cookie, $response, $options);
-    }
+    my $cookie = $self->state->get_session_id($request) or return;
+
+    my($time, $b64, $sig) = split /:/, $cookie, 3;
+    $self->sig($b64) eq $sig or return;
+
+    my $session = Storable::thaw(MIME::Base64::decode($b64));
+    return ($time, $session);
+}
+
+sub generate_id {
+    my $self = shift;
+    return Time::HiRes::gettimeofday;
+}
+
+sub commit { }
+
+sub save_state {
+    my($self, $id, $res, $session, $options) = @_;
+
+    my $cookie = $self->_serialize($id, $session);
+    $self->state->finalize($cookie, $res, $options);
 }
 
 sub _serialize {
-    my($self, $session) = @_;
+    my($self, $id, $session) = @_;
 
-    my $now = Time::HiRes::gettimeofday;
     my $b64 = MIME::Base64::encode( Storable::freeze($session), '' );
-    join ":", $now, $b64, $self->sig($b64);
+    join ":", $id, $b64, $self->sig($b64);
 }
 
 sub sig {
