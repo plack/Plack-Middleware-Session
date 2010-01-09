@@ -5,11 +5,15 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Util::Accessor qw( manager _data options );
+use Plack::Util::Accessor qw( manager session options );
 
 sub new {
-    my ($class, %params) = @_;
-    bless { %params } => $class;
+    my ($class, $env, $manager ) = @_;
+    bless {
+        manager => $manager,
+        session => $env->{'psgix.session'},
+        options => $env->{'psgix.session.options'},
+    }, $class;
 }
 
 sub id {
@@ -21,29 +25,29 @@ sub id {
 
 sub dump {
     my $self = shift;
-    $self->_data;
+    $self->session;
 }
 
 sub get {
     my ($self, $key) = @_;
-    $self->_data->{$key};
+    $self->session->{$key};
 }
 
 sub set {
     my ($self, $key, $value) = @_;
-    delete $self->options->{no_commit};
-    $self->_data->{$key} = $value;
+    delete $self->options->{no_store};
+    $self->session->{$key} = $value;
 }
 
 sub remove {
     my ($self, $key) = @_;
-    delete $self->options->{no_commit};
-    delete $self->_data->{$key};
+    delete $self->options->{no_store};
+    delete $self->session->{$key};
 }
 
 sub keys {
     my $self = shift;
-    keys %{$self->_data};
+    keys %{$self->session};
 }
 
 ## Lifecycle Management
@@ -51,14 +55,14 @@ sub keys {
 sub expire {
     my $self = shift;
     for my $key ($self->keys) {
-        delete $self->_data->{$key};
+        delete $self->session->{$key};
     }
     $self->options->{expire} = 1;
 }
 
 sub commit {
     my $self = shift;
-    $self->options->{no_commit} = 1;
+    $self->options->{no_store} = 1;
     $self->manager->commit($self->_data, $self->options);
 }
 
@@ -77,10 +81,19 @@ Plack::Session - Middleware for session management
   # Use with Middleware::Session
   enable "Session", session_class => "Plack::Session";
 
-  use Plack::Session;
+  my $app = sub {
+      my $env = shift;
+      my $session = $env->{'plack.session'}; # not psgix.
 
-  my $session = 
+      $session->id;
+      $session->get($key);
+      $session->set($key, $value);
+      $session->remove($key);
+      $session->keys;
 
+      $session->expire;
+      $session->commit;
+  };
 
 =head1 DESCRIPTION
 
@@ -92,26 +105,14 @@ own session middleware component.
 
 =over 4
 
-=item B<new ( %params )>
+=item B<new ( $env, $mw )>
 
-The constructor expects keys in C<%params> for I<state>,
-I<store> and I<request>. The I<request> param is expected to be
-a L<Plack::Request> instance or an object with an equivalent
-interface.
+The constructor takes a PSGI request env hash reference and
+Plack::Middleware::Session facade object.
 
 =item B<id>
 
 This is the accessor for the session id.
-
-=item B<state>
-
-This is expected to be a L<Plack::Session::State> instance or
-an object with an equivalent interface.
-
-=item B<store>
-
-This is expected to be a L<Plack::Session::Store> instance or
-an object with an equivalent interface.
 
 =back
 
@@ -131,6 +132,8 @@ you call C<finalize> on it.
 
 =item B<keys>
 
+=item B<session>, B<dump>
+
 =back
 
 =head2 Session Lifecycle Management
@@ -144,16 +147,7 @@ waiting for the response final phase.
 
 =item B<expire>
 
-This method can be called to expire the current session id. It marks
-the session as expire and call the C<cleanup> method on the C<store>
-and the C<expire_session_id> method on the C<state>.
-
-=item B<finalize ( $manager, $response )>
-
-This method should be called at the end of the response cycle. It will
-call the C<store> method on the C<store> and the C<expire_session_id>
-method on the C<state>. The C<$response> is expected to be a
-L<Plack::Response> instance or an object with an equivalent interface.
+This method can be called to expire the current session id.
 
 =back
 

@@ -58,11 +58,7 @@ sub call {
     $env->{'psgix.session.options'} = { id => $id };
 
     if ($self->session_class) {
-        $env->{'plack.session'} = $self->session_class->new(
-            manager => $self,
-            _data   => $env->{'psgix.session'},
-            options => $env->{'psgix.session.options'},
-        );
+        $env->{'plack.session'} = $self->session_class->new($env, $self);
     }
 
     my $res = $self->app->($env);
@@ -87,7 +83,7 @@ sub commit {
 sub finalize {
     my($self, $session, $options, $response) = @_;
 
-    $self->commit($session, $options);
+    $self->commit($session, $options) unless $options->{no_store};
     if ($options->{expire}) {
         $self->state->expire_session_id($options->{id}, $response);
     } else {
