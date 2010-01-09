@@ -9,6 +9,8 @@ use Plack::Util::Accessor qw( session options );
 
 sub new {
     my ($class, $env) = @_;
+    # NOTE: when you make a subclass, be sure to NEVER save $env in
+    # your hash. That will create a circular reference.
     bless {
         session => $env->{'psgix.session'},
         options => $env->{'psgix.session.options'},
@@ -110,8 +112,7 @@ This is the accessor for the session id.
 =head2 Session Data Management
 
 These methods allows you to read and write the session data like
-Perl's normal hash. The operation is not synced to the storage until
-you call C<finalize> on it.
+Perl's normal hash.
 
 =over 4
 

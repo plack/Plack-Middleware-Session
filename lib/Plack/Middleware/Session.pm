@@ -63,7 +63,7 @@ sub call {
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $self->finalize($request, $res);
+        $self->finalize($env, $res);
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
@@ -85,7 +85,11 @@ sub generate_id {
 }
 
 sub commit {
-    my($self, $session, $options) = @_;
+    my($self, $env) = @_;
+
+    my $session = $env->{'psgix.session'};
+    my $options = $env->{'psgix.session.options'};
+
     if ($options->{expire}) {
         $self->store->remove($options->{id});
     } else {
@@ -94,27 +98,27 @@ sub commit {
 }
 
 sub finalize {
-    my($self, $request, $response) = @_;
+    my($self, $env, $response) = @_;
 
-    my $session = $request->env->{'psgix.session'};
-    my $options = $request->env->{'psgix.session.options'};
+    my $session = $env->{'psgix.session'};
+    my $options = $env->{'psgix.session.options'};
 
-    $self->commit($session, $options) unless $options->{no_store};
+    $self->commit($env) unless $options->{no_store};
     if ($options->{expire}) {
-        $self->expire_session($options->{id}, $response, $session, $options);
+        $self->expire_session($options->{id}, $response, $env);
     } else {
-        $self->save_state($options->{id}, $response, $session, $options);
+        $self->save_state($options->{id}, $response, $env);
     }
 }
 
 sub expire_session {
-    my($self, $id, $res, $session, $options) = @_;
-    $self->state->expire_session_id($options->{id}, $res, $options);
+    my($self, $id, $res, $env) = @_;
+    $self->state->expire_session_id($id, $res, $env->{'psgix.session.options'});
 }
 
 sub save_state {
-    my($self, $id, $res, $session, $options) = @_;
-    $self->state->finalize($id, $res, $options);
+    my($self, $id, $res, $env) = @_;
+    $self->state->finalize($id, $res, $env->{'psgix.session.options'});
 }
 
 1;

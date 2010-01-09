@@ -44,10 +44,10 @@ sub generate_id {
 sub commit { }
 
 sub save_state {
-    my($self, $id, $res, $session, $options) = @_;
+    my($self, $id, $res, $env) = @_;
 
-    my $cookie = $self->_serialize($id, $session);
-    $self->state->finalize($cookie, $res, $options);
+    my $cookie = $self->_serialize($id, $env->{'psgix.session'});
+    $self->state->finalize($cookie, $res, $env->{'psgix.session.options'});
 }
 
 sub _serialize {
