@@ -5,8 +5,6 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Request;
-use Plack::Response;
 use Plack::Util;
 use Scalar::Util;
 
@@ -44,13 +42,11 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    my $request = Plack::Request->new($env);
-
-    my($id, $session) = $self->get_session($request);
+    my($id, $session) = $self->get_session($env);
     if ($id && $session) {
         $env->{'psgix.session'} = $session;
     } else {
-        $id = $self->generate_id($request);
+        $id = $self->generate_id($env);
         $env->{'psgix.session'} = {};
     }
 
@@ -61,27 +57,21 @@ sub call {
     }
 
     my $res = $self->app->($env);
-    $self->response_cb($res, sub {
-        my $res = Plack::Response->new(@{$_[0]});
-        $self->finalize($env, $res);
-        $res = $res->finalize;
-        $_[0]->[0] = $res->[0];
-        $_[0]->[1] = $res->[1];
-    });
+    $self->response_cb($res, sub { $self->finalize($env, $_[0]) });
 }
 
 sub get_session {
-    my($self, $request) = @_;
+    my($self, $env) = @_;
 
-    my $id = $self->state->extract($request) or return;
-    my $session = $self->store->fetch($id)   or return;
+    my $id = $self->state->extract($env)   or return;
+    my $session = $self->store->fetch($id) or return;
 
     return ($id, $session);
 }
 
 sub generate_id {
-    my($self, $request) = @_;
-    $self->state->generate($request);
+    my($self, $env) = @_;
+    $self->state->generate($env);
 }
 
 sub commit {
@@ -98,16 +88,16 @@ sub commit {
 }
 
 sub finalize {
-    my($self, $env, $response) = @_;
+    my($self, $env, $res) = @_;
 
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
     $self->commit($env) unless $options->{no_store};
     if ($options->{expire}) {
-        $self->expire_session($options->{id}, $response, $env);
+        $self->expire_session($options->{id}, $res, $env);
     } else {
-        $self->save_state($options->{id}, $response, $env);
+        $self->save_state($options->{id}, $res, $env);
     }
 }
 

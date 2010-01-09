@@ -26,7 +26,7 @@ sub new {
 }
 
 sub expire_session_id {
-    my ($self, $id, $response) = @_;
+    my ($self, $id, $res) = @_;
 }
 
 sub validate_session_id {
@@ -35,14 +35,14 @@ sub validate_session_id {
 }
 
 sub get_session_id {
-    my ($self, $request) = @_;
-    return $request->param( $self->session_key );
+    my ($self, $env) = @_;
+    return Plack::Request->new($env)->param( $self->session_key );
 }
 
 sub extract {
-    my ($self, $request) = @_;
+    my ($self, $env) = @_;
 
-    my $id = $self->get_session_id( $request );
+    my $id = $self->get_session_id( $env );
     return unless defined $id;
 
     return $id if $self->validate_session_id( $id );
@@ -56,7 +56,7 @@ sub generate {
 
 
 sub finalize {
-    my ($self, $id, $response, $options) = @_;
+    my ($self, $id, $res, $options) = @_;
     ();
 }
 
@@ -127,9 +127,9 @@ This is a regex used to validate requested session id.
 
 =over 4
 
-=item B<get_session_id ( $request )>
+=item B<get_session_id ( $env )>
 
-This is the method used to extract the session id from a C<$request>.
+This is the method used to extract the session id from a C<$env>.
 Subclasses will often only need to override this method and the
 C<finalize> method.
 
@@ -138,14 +138,12 @@ C<finalize> method.
 This will use the C<sid_validator> regex and confirm that the
 C<$session_id> is valid.
 
-=item B<extract ( $request )>
+=item B<extract ( $env )>
 
-This will attempt to extract the session from a C<$request> by looking
-for the C<session_key> in the C<$request> params. It will then check to
+This will attempt to extract the session from a C<$env> by looking
+for the C<session_key> in the request params. It will then check to
 see if the session is valid and that it has not expired. It will return
-the session id if everything is good or undef otherwise. The C<$request>
-is expected to be a L<Plack::Request> instance or an object with an
-equivalent interface.
+the session id if everything is good or undef otherwise.
 
 =item B<generate ( $request )>
 

@@ -6,6 +6,8 @@ our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use parent 'Plack::Session::State';
+use Plack::Request;
+use Plack::Response;
 
 use Plack::Util::Accessor qw[
     path
@@ -15,30 +17,35 @@ use Plack::Util::Accessor qw[
 ];
 
 sub get_session_id {
-    my ($self, $request) = @_;
-    ( $request->cookie( $self->session_key ) || return )->value;
+    my ($self, $env) = @_;
+    ( Plack::Request->new($env)->cookie( $self->session_key ) || return )->value;
 }
 
 sub expire_session_id {
-    my ($self, $id, $response) = @_;
-    $response->cookies->{ $self->session_key } = +{
-        value => $id,
-        path  => ($self->path || '/'),
-        expires => 0,
-        ( defined $self->domain  ? ( domain  => $self->domain  ) : () ),
-        ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
-    };
+    my ($self, $id, $res, $options) = @_;
+    $self->_set_cookie($id, $res, expires => 0);
 }
 
 sub finalize {
-    my ($self, $id, $response, $options) = @_;
+    my ($self, $id, $res, $options) = @_;
+    $self->_set_cookie($id, $res, (defined $self->expires ? (expires => $self->expires) : ()));
+}
+
+sub _set_cookie {
+    my($self, $id, $res, %options) = @_;
+
+    # TODO: Do not use Plack::Response
+    my $response = Plack::Response->new($res);
     $response->cookies->{ $self->session_key } = +{
         value => $id,
         path  => ($self->path || '/'),
         ( defined $self->domain  ? ( domain  => $self->domain  ) : () ),
-        ( defined $self->expires ? ( expires => $self->expires ) : () ),
         ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
+        %options,
     };
+
+    my $final_r = $response->finalize;
+    $res->[1] = $final_r->[1]; # headers
 }
 
 1;
