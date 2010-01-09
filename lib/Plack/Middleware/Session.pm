@@ -58,7 +58,7 @@ sub call {
     $env->{'psgix.session.options'} = { id => $id };
 
     if ($self->session_class) {
-        $env->{'plack.session'} = $self->session_class->new($env, $self);
+        $env->{'plack.session'} = $self->session_class->new($env);
     }
 
     my $res = $self->app->($env);

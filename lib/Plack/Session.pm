@@ -5,12 +5,11 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Util::Accessor qw( manager session options );
+use Plack::Util::Accessor qw( session options );
 
 sub new {
-    my ($class, $env, $manager ) = @_;
+    my ($class, $env) = @_;
     bless {
-        manager => $manager,
         session => $env->{'psgix.session'},
         options => $env->{'psgix.session.options'},
     }, $class;
@@ -60,12 +59,6 @@ sub expire {
     $self->options->{expire} = 1;
 }
 
-sub commit {
-    my $self = shift;
-    $self->options->{no_store} = 1;
-    $self->manager->commit($self->_data, $self->options);
-}
-
 1;
 
 __END__
@@ -92,7 +85,6 @@ Plack::Session - Middleware for session management
       $session->keys;
 
       $session->expire;
-      $session->commit;
   };
 
 =head1 DESCRIPTION
@@ -105,10 +97,9 @@ own session middleware component.
 
 =over 4
 
-=item B<new ( $env, $mw )>
+=item B<new ( $env )>
 
-The constructor takes a PSGI request env hash reference and
-Plack::Middleware::Session facade object.
+The constructor takes a PSGI request env hash reference.
 
 =item B<id>
 
@@ -139,11 +130,6 @@ you call C<finalize> on it.
 =head2 Session Lifecycle Management
 
 =over 4
-
-=item B<commit>
-
-This method synchronizes the session data to the data store, without
-waiting for the response final phase.
 
 =item B<expire>
 
