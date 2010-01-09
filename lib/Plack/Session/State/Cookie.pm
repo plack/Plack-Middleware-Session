@@ -14,15 +14,20 @@ use Plack::Util::Accessor qw[
     secure
 ];
 
-sub expire_session_id {
-    my ($self, $id) = @_;
-    $self->SUPER::expire_session_id( $id );
-    $self->expires( 0 );
-}
-
 sub get_session_id {
     my ($self, $request) = @_;
     ( $request->cookie( $self->session_key ) || return )->value;
+}
+
+sub expire_session_id {
+    my ($self, $id, $response) = @_;
+    $response->cookies->{ $self->session_key } = +{
+        value => $id,
+        path  => ($self->path || '/'),
+        expires => 0,
+        ( defined $self->domain  ? ( domain  => $self->domain  ) : () ),
+        ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
+    };
 }
 
 sub finalize {
@@ -34,14 +39,6 @@ sub finalize {
         ( defined $self->expires ? ( expires => $self->expires ) : () ),
         ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
     };
-
-    # clear the expires after
-    # finalization if the session
-    # has been expired - SL
-    $self->expires( undef )
-        if defined $self->expires
-        && $self->expires == 0
-        && $self->is_session_expired( $id );
 }
 
 1;

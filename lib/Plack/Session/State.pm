@@ -16,7 +16,6 @@ use Plack::Util::Accessor qw[
 sub new {
     my ($class, %params) = @_;
 
-    $params{'_expired'}      ||= +{};
     $params{'session_key'}   ||= 'plack_session';
     $params{'sid_generator'} ||= sub {
         Digest::SHA1::sha1_hex(rand() . $$ . {} . time)
@@ -27,19 +26,7 @@ sub new {
 }
 
 sub expire_session_id {
-    my ($self, $id) = @_;
-    $self->{'_expired'}->{ $id }++;
-}
-
-sub is_session_expired {
-    my ($self, $id) = @_;
-    exists $self->{'_expired'}->{ $id }
-}
-
-sub check_expired {
-    my ($self, $id) = @_;
-    return if $self->is_session_expired( $id );
-    return $id;
+    my ($self, $id, $response) = @_;
 }
 
 sub validate_session_id {
@@ -58,9 +45,8 @@ sub extract {
     my $id = $self->get_session_id( $request );
     return unless defined $id;
 
-    $self->validate_session_id( $id )
-        &&
-    $self->check_expired( $id );
+    return $id if $self->validate_session_id( $id );
+    return;
 }
 
 sub generate {
@@ -182,20 +168,10 @@ interface.
 
 =over 4
 
-=item B<expire_session_id ( $id )>
+=item B<expire_session_id ( $id, $response )>
 
 This will mark the session for C<$id> as expired. This method is called
 by the L<Plack::Session> C<expire> method.
-
-=item B<is_session_expired ( $id )>
-
-This will check to see if the session C<$id> has been marked as
-expired.
-
-=item B<check_expired ( $id )>
-
-Given an session C<$id> this will return C<undef> if the session is
-expired or return the C<$id> if it is not.
 
 =back
 

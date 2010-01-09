@@ -84,7 +84,7 @@ store or delete multiple keys at a time.
 
 =item B<fetch ( $session_id )>
 
-=item B<store ( $session_id, $data )>
+=item B<store ( $session_id, $session )>
 
 =back
 

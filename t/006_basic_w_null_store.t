@@ -56,7 +56,7 @@ my $request_creator = sub {
     my $resp = $r->new_response;
 
     lives_ok {
-        $s->finalize( $resp );
+        $s->finalize( $m, $resp );
     } '... finalized session successfully';
 }
 

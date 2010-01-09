@@ -5,18 +5,18 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Util::Accessor qw( id is_new manager );
+use Plack::Util::Accessor qw( id expired _manager );
 
 sub fetch_or_create {
     my($class, $request, $manager) = @_;
 
-    my $id = $manager->state->extract($request);
-    if ($id) {
-        my $store = $manager->store->fetch($id);
-        return $class->new( id => $id, _stash => $store, manager => $manager );
+    my($id, $session);
+    if ($id = $manager->state->extract($request) and
+        $session = $manager->store->fetch($id)) {
+        return $class->new( id => $id, _stash => $session, _manager => $manager, _changed => 0 );
     } else {
         $id = $manager->state->generate($request);
-        return $class->new( id => $id, _stash => {}, manager => $manager, is_new => 1 );
+        return $class->new( id => $id, _stash => {}, _manager => $manager, _changed=> 1 );
     }
 }
 
@@ -39,11 +39,13 @@ sub get {
 
 sub set {
     my ($self, $key, $value) = @_;
+    $self->{_changed}++;
     $self->{_stash}{$key} = $value;
 }
 
 sub remove {
     my ($self, $key) = @_;
+    $self->{_changed}++;
     delete $self->{_stash}{$key};
 }
 
@@ -57,14 +59,35 @@ sub keys {
 sub expire {
     my $self = shift;
     $self->{_stash} = {};
-    $self->manager->store->cleanup( $self->id );
-    $self->manager->state->expire_session_id( $self->id );
+    $self->expired(1);
+}
+
+sub commit {
+    my $self = shift;
+
+    if ($self->expired) {
+        $self->_manager->store->cleanup($self->id);
+    } else {
+        $self->_manager->store->store($self->id, $self);
+    }
+
+    $self->{_changed} = 0;
+}
+
+sub is_changed {
+    my $self = shift;
+    $self->{_changed} > 0;
 }
 
 sub finalize {
     my ($self, $response) = @_;
-    $self->manager->store->store( $self->id, $self );
-    $self->manager->state->finalize( $self->id, $response );
+
+    $self->commit if $self->is_changed || $self->expired;
+    if ($self->expired) {
+        $self->_manager->state->expire_session_id($self->id, $response);
+    } else {
+        $self->_manager->state->finalize($self->id, $response, $self);
+    }
 }
 
 1;
@@ -147,20 +170,23 @@ you call C<finalize> on it.
 
 =over 4
 
+=item B<commit>
+
+This method synchronizes the session data to the data store, without
+waiting for the response final phase.
+
 =item B<expire>
 
-This method can be called to expire the current session id. It
-will call the C<cleanup> method on the C<store> and the C<finalize>
-method on the C<state>, passing both of them the session id and
-the C<$response>.
+This method can be called to expire the current session id. It marks
+the session as expire and call the C<cleanup> method on the C<store>
+and the C<expire_session_id> method on the C<state>.
 
-=item B<finalize ( $response )>
+=item B<finalize ( $manager, $response )>
 
-This method should be called at the end of the response cycle. It
-will call the C<store> method on the C<store> and the
-C<expire_session_id> method on the C<state>, passing both of them
-the session id. The C<$response> is expected to be a L<Plack::Response>
-instance or an object with an equivalent interface.
+This method should be called at the end of the response cycle. It will
+call the C<store> method on the C<store> and the C<expire_session_id>
+method on the C<state>. The C<$response> is expected to be a
+L<Plack::Response> instance or an object with an equivalent interface.
 
 =back
 

@@ -1,12 +1,10 @@
 use strict;
 use Test::More;
-use Test::Requires qw(Plack::Server::AnyEvent);
 use Plack::Test;
 use Plack::Middleware::Session;
 use HTTP::Request::Common;
 
 $Plack::Test::Impl = 'Server';
-$ENV{PLACK_SERVER} = 'AnyEvent';
 
 my $app = sub {
     return sub {

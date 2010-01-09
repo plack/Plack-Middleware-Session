@@ -31,12 +31,17 @@ sub new {
 
 sub fetch {
     my ($self, $session_id) = @_;
-    return $self->_deserialize( $session_id );
+
+    my $file_path = $self->_get_session_file_path( $session_id );
+    return unless -f $file_path;
+
+    $self->deserializer->( $file_path );
 }
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->_serialize( $session_id, $session->dump );
+    my $file_path = $self->_get_session_file_path( $session_id );
+    $self->serializer->( $session->dump, $file_path );
 }
 
 sub cleanup {
@@ -47,19 +52,6 @@ sub cleanup {
 sub _get_session_file_path {
     my ($self, $session_id) = @_;
     $self->dir . '/' . $session_id;
-}
-
-sub _serialize {
-    my ($self, $session_id, $value) = @_;
-    my $file_path = $self->_get_session_file_path( $session_id );
-    $self->serializer->( $value, $file_path );
-}
-
-sub _deserialize {
-    my ($self, $session_id) = @_;
-    my $file_path = $self->_get_session_file_path( $session_id );
-    $self->_serialize( $session_id, {} ) unless -f $file_path;
-    $self->deserializer->( $file_path );
 }
 
 1;

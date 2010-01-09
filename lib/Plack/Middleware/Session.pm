@@ -41,18 +41,23 @@ sub inflate_backend {
     Plack::Util::load_class(@class)->new();
 }
 
+sub fetch_or_create_session {
+    my($self, $req) = @_;
+    $self->session_class->fetch_or_create($req, $self);
+}
+
 sub call {
     my $self = shift;
     my $env  = shift;
 
-    my $session = $self->session_class->fetch_or_create( Plack::Request->new($env), $self );
+    my $session = $self->fetch_or_create_session(Plack::Request->new($env));
 
     $env->{'psgix.session'} = $env->{'plack.session'} = $session;
 
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $env->{'psgix.session'}->finalize( $res );
+        $env->{'psgix.session'}->finalize($res);
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
