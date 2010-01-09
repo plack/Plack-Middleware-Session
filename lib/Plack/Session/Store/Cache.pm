@@ -33,7 +33,7 @@ sub store {
     $self->cache->set($session_id => $session);
 }
 
-sub cleanup {
+sub remove {
     my ($self, $session_id) = @_;
     $self->cache->remove($session_id);
 }

@@ -8,7 +8,7 @@ our $AUTHORITY = 'cpan:STEVAN';
 sub new     { bless {} => shift }
 sub fetch   {}
 sub store   {}
-sub cleanup {}
+sub remove  {}
 
 1;
 

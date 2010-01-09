@@ -23,7 +23,7 @@ sub store {
     $self->_stash->{ $session_id } = $session;
 }
 
-sub cleanup {
+sub remove {
     my ($self, $session_id) = @_;
     delete $self->_stash->{ $session_id }
 }
@@ -92,7 +92,7 @@ store or delete multiple keys at a time.
 
 =over 4
 
-=item B<cleanup ( $session_id )>
+=item B<remove ( $session_id )>
 
 This method is called by the L<Plack::Session> C<expire> method and
 is used to remove any session data.

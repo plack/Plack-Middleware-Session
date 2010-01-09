@@ -44,7 +44,7 @@ sub store {
     $self->serializer->( $session, $file_path );
 }
 
-sub cleanup {
+sub remove {
     my ($self, $session_id) = @_;
     unlink $self->_get_session_file_path( $session_id );
 }

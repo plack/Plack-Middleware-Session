@@ -87,7 +87,7 @@ sub generate_id {
 sub commit {
     my($self, $session, $options) = @_;
     if ($options->{expire}) {
-        $self->store->cleanup($options->{id});
+        $self->store->remove($options->{id});
     } else {
         $self->store->store($options->{id}, $session);
     }
