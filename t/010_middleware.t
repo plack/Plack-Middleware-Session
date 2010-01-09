@@ -6,16 +6,16 @@ use HTTP::Cookies;
 
 my $app = sub {
     my $env = shift;
-    my $counter = $env->{'psgix.session'}->get('counter') || 0;
+    my $counter = $env->{'plack.session'}->get('counter') || 0;
 
     my $body = "Counter=$counter";
     $counter++;
-    $env->{'psgix.session'}->set(counter => $counter);
+    $env->{'plack.session'}->set(counter => $counter);
 
     return [ 200, [], [ $body ] ];
 };
 
-$app = Plack::Middleware::Session->wrap($app);
+$app = Plack::Middleware::Session->wrap($app, session_class => "Plack::Session");
 
 test_psgi $app, sub {
     my $cb = shift;

@@ -30,7 +30,7 @@ sub fetch {
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->cache->set($session_id => $session->dump);
+    $self->cache->set($session_id => $session);
 }
 
 sub cleanup {

@@ -6,32 +6,49 @@ use Test::More;
 use Test::Exception;
 use Plack::Middleware::Session;
 
+sub create_session {
+    my($mw, $env) = @_;
+
+    my $session;
+    my $app = sub {
+        my $env = shift;
+        $session = $env->{'plack.session'};
+        return sub {
+            my $responder = shift;
+            $responder->([ 200, [], [] ]);
+        };
+    };
+
+    my $res = $mw->($app)->($env);
+
+    return ($session, $res);
+}
+
 sub run_all_tests {
     my %params = @_;
 
     my (
-        $request_creator,
+        $env_cb,
         $state,
         $storage,
         $response_test
     ) = @params{qw[
-        request_creator
+        env_cb
         state
         store
         response_test
     ]};
 
-    my $m = Plack::Middleware::Session->new(state => $state, store => $storage);
+    my $m = sub { Plack::Middleware::Session->wrap($_[0], session_class => "Plack::Session", state => $state, store => $storage) };
 
-    $response_test = sub {
-        my ($response, $session_id, $check_expired) = @_;
+    $response_test ||= sub {
+        my($res_cb, $session_id, $check_expired) = @_;
+        $res_cb->(sub { my $res = shift });
     };
 
     my @sids;
     {
-        my $r = $request_creator->();
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->());
 
         push @sids, $s->id;
 
@@ -51,21 +68,13 @@ sub run_all_tests {
 
         is($s->get('bar'), 'baz', '... got the foo value back successfully from session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { foo => 'bar', bar => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[0] );
+        $response_test->($res, $sids[0]);
     }
 
     {
-        my $r = $request_creator->();
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->());
 
         push @sids, $s->id;
 
@@ -78,22 +87,13 @@ sub run_all_tests {
 
         is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { foo => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[1] );
+        $response_test->($res, $sids[1]);
     }
 
     {
-        my $r = $request_creator->({ plack_session => $sids[0] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
-
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[0] }));
         is($s->id, $sids[0], '... got a basic session id');
 
         is($s->get('foo'), 'bar', '... got the value for foo back successfully from session');
@@ -105,42 +105,26 @@ sub run_all_tests {
 
         ok(!$s->get('foo'), '... no value stored for foo in session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { bar => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[0] );
+        $response_test->( $res, $sids[0] );
     }
 
 
     {
-        my $r = $request_creator->({ plack_session => $sids[1] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[1] }));
 
         is($s->id, $sids[1], '... got a basic session id');
 
         is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { foo => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[1] );
+        $response_test->( $res, $sids[1] );
     }
 
     {
-        my $r = $request_creator->({ plack_session => $sids[0] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[0] }));
 
         is($s->id, $sids[0], '... got a basic session id');
 
@@ -150,21 +134,13 @@ sub run_all_tests {
             $s->set( baz => 'gorch' );
         } '... set the bar value successfully in session';
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { bar => 'baz', baz => 'gorch' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[0] );
+        $response_test->( $res, $sids[0] );
     }
 
     {
-        my $r = $request_creator->({ plack_session => $sids[0] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[0] }));
 
         is($s->get('bar'), 'baz', '... got the bar value back successfully from session');
 
@@ -172,63 +148,39 @@ sub run_all_tests {
             $s->expire;
         } '... expired session successfully';
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
+        $response_test->( $res, $sids[0], 1 );
 
         is_deeply( $s->dump, {}, '... got the session dump we expected');
-
-        $response_test->( $resp, $sids[0], 1 );
     }
 
     {
-        my $r = $request_creator->({ plack_session => $sids[0] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[0] }));
 
         push @sids, $s->id;
         isnt($s->id, $sids[0], 'expired ... got a new session id');
 
         ok(!$s->get('bar'), '... no bar value stored');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, {}, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[2] );
+        $response_test->( $res, $sids[2] );
     }
 
     {
-        my $r = $request_creator->({ plack_session => $sids[1] });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => $sids[1] }));
 
         is($s->id, $sids[1], '... got a basic session id');
 
         is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { foo => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $sids[1] );
+        $response_test->( $res, $sids[1] );
     }
 
     {
         # wrong format session_id
-        my $r = $request_creator->({ plack_session => '../wrong' });
-
-        my $s = Plack::Session->fetch_or_create($r, $m);
+        my($s, $res) = create_session($m, $env_cb->({ plack_session => "../wrong" }));
 
         isnt('../wrong' => $s->id, '... regenerate session id');
 
@@ -240,15 +192,9 @@ sub run_all_tests {
 
         is($s->get('foo'), 'baz', '... got the foo value back successfully from session');
 
-        my $resp = $r->new_response;
-
-        lives_ok {
-            $s->finalize( $resp );
-        } '... finalized session successfully';
-
         is_deeply( $s->dump, { foo => 'baz' }, '... got the session dump we expected');
 
-        $response_test->( $resp, $s );
+        $response_test->( $res, $s->id );
     }
 }
 

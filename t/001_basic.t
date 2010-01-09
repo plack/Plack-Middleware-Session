@@ -13,9 +13,9 @@ use Plack::Session::Store;
 use t::lib::TestSession;
 
 t::lib::TestSession::run_all_tests(
-    store           => Plack::Session::Store->new,
-    state           => Plack::Session::State->new,
-    request_creator => sub {
+    store  => Plack::Session::Store->new,
+    state  => Plack::Session::State->new,
+    env_cb => sub {
         open my $in, '<', \do { my $d };
         my $env = {
             'psgi.version'    => [ 1, 0 ],
@@ -24,10 +24,8 @@ t::lib::TestSession::run_all_tests(
             'psgi.url_scheme' => 'http',
             SERVER_PORT       => 80,
             REQUEST_METHOD    => 'GET',
+            QUERY_STRING      => join "&" => map { $_ . "=" . $_[0]->{ $_ } } keys %{$_[0] || +{}},
         };
-        my $r = Plack::Request->new( $env );
-        $r->parameters( @_ );
-        $r;
     },
 );
 

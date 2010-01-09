@@ -12,6 +12,11 @@ sub new {
     bless { %params } => $class;
 }
 
+sub id {
+    my $self = shift;
+    $self->options->{id};
+}
+
 ## Data Managment
 
 sub dump {
@@ -45,6 +50,9 @@ sub keys {
 
 sub expire {
     my $self = shift;
+    for my $key ($self->keys) {
+        delete $self->_data->{$key};
+    }
     $self->options->{expire} = 1;
 }
 

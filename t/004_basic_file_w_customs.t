@@ -20,13 +20,13 @@ if ( !-d $TMP ) {
 }
 
 t::lib::TestSession::run_all_tests(
-    store           => Plack::Session::Store::File->new(
+    store  => Plack::Session::Store::File->new(
         dir          => $TMP,
         serializer   => sub { YAML::DumpFile( reverse @_ ) }, # YAML takes it's args the opposite of Storable
         deserializer => sub { YAML::LoadFile( @_ ) },
     ),
-    state           => Plack::Session::State->new,
-    request_creator => sub {
+    state  => Plack::Session::State->new,
+    env_cb => sub {
         open my $in, '<', \do { my $d };
         my $env = {
             'psgi.version'    => [ 1, 0 ],
@@ -35,10 +35,8 @@ t::lib::TestSession::run_all_tests(
             'psgi.url_scheme' => 'http',
             SERVER_PORT       => 80,
             REQUEST_METHOD    => 'GET',
+            QUERY_STRING      => join "&" => map { $_ . "=" . $_[0]->{ $_ } } keys %{$_[0] || +{}},
         };
-        my $r = Plack::Request->new( $env );
-        $r->parameters( @_ );
-        $r;
     },
 );
 

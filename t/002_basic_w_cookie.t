@@ -9,13 +9,14 @@ use Plack::Request;
 use Plack::Session;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store;
+use Plack::Util;
 
 use t::lib::TestSession;
 
 t::lib::TestSession::run_all_tests(
-    store           => Plack::Session::Store->new,
-    state           => Plack::Session::State::Cookie->new,
-    request_creator => sub {
+    store  => Plack::Session::Store->new,
+    state  => Plack::Session::State::Cookie->new,
+    env_cb => sub {
         my $cookies = shift;
         open my $in, '<', \do { my $d };
         my $env = {
@@ -27,23 +28,19 @@ t::lib::TestSession::run_all_tests(
             REQUEST_METHOD    => 'GET',
             HTTP_COOKIE       => join "; " => map { $_ . "=" . $cookies->{ $_ } } keys %$cookies,
         };
-        return Plack::Request->new( $env );
     },
     response_test   => sub {
-        my ($response, $session_id, $check_expired) = @_;
-        is_deeply(
-            $response->cookies,
-            {
-                plack_session => {
-                    value => $session_id,
-                    path  => '/',
-                    ($check_expired
-                        ? ( expires => '0' )
-                        : ())
-                }
-            },
-            '... got the right cookies in the response'
-        );
+        my ($res_cb, $session_id, $check_expired) = @_;
+        my $cookie;
+        $res_cb->(sub {
+            my $res = shift;
+            $cookie = Plack::Util::header_get($res->[1], 'Set-Cookie');
+        });
+
+        like $cookie, qr/plack_session=$session_id/;
+        if ($check_expired) {
+            like $cookie, qr/expires=/;
+        }
     }
 );
 

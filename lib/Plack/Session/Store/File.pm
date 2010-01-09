@@ -41,7 +41,7 @@ sub fetch {
 sub store {
     my ($self, $session_id, $session) = @_;
     my $file_path = $self->_get_session_file_path( $session_id );
-    $self->serializer->( $session->dump, $file_path );
+    $self->serializer->( $session, $file_path );
 }
 
 sub cleanup {
