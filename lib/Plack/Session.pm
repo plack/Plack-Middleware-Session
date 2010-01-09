@@ -5,20 +5,7 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Util::Accessor qw( id expired _manager );
-
-sub fetch_or_create {
-    my($class, $request, $manager) = @_;
-
-    my($id, $session);
-    if ($id = $manager->state->extract($request) and
-        $session = $manager->store->fetch($id)) {
-        return $class->new( id => $id, _stash => $session, _manager => $manager, _changed => 0 );
-    } else {
-        $id = $manager->state->generate($request);
-        return $class->new( id => $id, _stash => {}, _manager => $manager, _changed=> 1 );
-    }
-}
+use Plack::Util::Accessor qw( manager _data options );
 
 sub new {
     my ($class, %params) = @_;
@@ -29,65 +16,42 @@ sub new {
 
 sub dump {
     my $self = shift;
-    $self->{_stash};
+    $self->_data;
 }
 
 sub get {
     my ($self, $key) = @_;
-    $self->{_stash}{$key};
+    $self->_data->{$key};
 }
 
 sub set {
     my ($self, $key, $value) = @_;
-    $self->{_changed}++;
-    $self->{_stash}{$key} = $value;
+    delete $self->options->{no_commit};
+    $self->_data->{$key} = $value;
 }
 
 sub remove {
     my ($self, $key) = @_;
-    $self->{_changed}++;
-    delete $self->{_stash}{$key};
+    delete $self->options->{no_commit};
+    delete $self->_data->{$key};
 }
 
 sub keys {
     my $self = shift;
-    keys %{$self->{_stash}};
+    keys %{$self->_data};
 }
 
 ## Lifecycle Management
 
 sub expire {
     my $self = shift;
-    $self->{_stash} = {};
-    $self->expired(1);
+    $self->options->{expire} = 1;
 }
 
 sub commit {
     my $self = shift;
-
-    if ($self->expired) {
-        $self->_manager->store->cleanup($self->id);
-    } else {
-        $self->_manager->store->store($self->id, $self);
-    }
-
-    $self->{_changed} = 0;
-}
-
-sub is_changed {
-    my $self = shift;
-    $self->{_changed} > 0;
-}
-
-sub finalize {
-    my ($self, $response) = @_;
-
-    $self->commit if $self->is_changed || $self->expired;
-    if ($self->expired) {
-        $self->_manager->state->expire_session_id($self->id, $response);
-    } else {
-        $self->_manager->state->finalize($self->id, $response, $self);
-    }
+    $self->options->{no_commit} = 1;
+    $self->manager->commit($self->_data, $self->options);
 }
 
 1;
@@ -102,18 +66,13 @@ Plack::Session - Middleware for session management
 
 =head1 SYNOPSIS
 
+  # Use with Middleware::Session
+  enable "Session", session_class => "Plack::Session";
+
   use Plack::Session;
 
-  my $store = Plack::Session::Store->new;
-  my $state = Plack::Session::State->new;
+  my $session = 
 
-  my $s = Plack::Session->new(
-      store   => $store,
-      state   => $state,
-      request => Plack::Request->new( $env )
-  );
-
-  # ...
 
 =head1 DESCRIPTION
 

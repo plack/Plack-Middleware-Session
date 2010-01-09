@@ -31,7 +31,7 @@ sub expire_session_id {
 }
 
 sub finalize {
-    my ($self, $id, $response) = @_;
+    my ($self, $id, $response, $options) = @_;
     $response->cookies->{ $self->session_key } = +{
         value => $id,
         path  => ($self->path || '/'),

@@ -20,7 +20,7 @@ sub fetch {
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->_stash->{ $session_id } = $session->dump;
+    $self->_stash->{ $session_id } = $session;
 }
 
 sub cleanup {

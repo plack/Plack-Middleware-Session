@@ -5,7 +5,6 @@ use warnings;
 our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Plack::Session;
 use Plack::Request;
 use Plack::Response;
 use Plack::Util;
@@ -22,11 +21,11 @@ use Plack::Util::Accessor qw(
 sub prepare_app {
     my $self = shift;
 
-    $self->session_class( 'Plack::Session' ) unless $self->session_class;
-    $self->state( 'Cookie' )                 unless $self->state;
-
+    $self->state( 'Cookie' ) unless $self->state;
     $self->state( $self->inflate_backend('Plack::Session::State', $self->state) );
     $self->store( $self->inflate_backend('Plack::Session::Store', $self->store) );
+
+    Plack::Util::load_class($self->session_class) if $self->session_class;
 }
 
 sub inflate_backend {
@@ -41,27 +40,59 @@ sub inflate_backend {
     Plack::Util::load_class(@class)->new();
 }
 
-sub fetch_or_create_session {
-    my($self, $req) = @_;
-    $self->session_class->fetch_or_create($req, $self);
-}
-
 sub call {
     my $self = shift;
     my $env  = shift;
 
-    my $session = $self->fetch_or_create_session(Plack::Request->new($env));
+    my $request = Plack::Request->new($env);
 
-    $env->{'psgix.session'} = $env->{'plack.session'} = $session;
+    my($id, $session);
+    if ($id = $self->state->extract($request) and
+        $session = $self->store->fetch($id)) {
+        $env->{'psgix.session'} = $session;
+    } else {
+        $id = $self->state->generate($request);
+        $env->{'psgix.session'} = {};
+    }
+
+    $env->{'psgix.session.options'} = { id => $id };
+
+    if ($self->session_class) {
+        $env->{'plack.session'} = $self->session_class->new(
+            manager => $self,
+            _data   => $env->{'psgix.session'},
+            options => $env->{'psgix.session.options'},
+        );
+    }
 
     my $res = $self->app->($env);
     $self->response_cb($res, sub {
         my $res = Plack::Response->new(@{$_[0]});
-        $env->{'psgix.session'}->finalize($res);
+        $self->finalize($env, $res);
         $res = $res->finalize;
         $_[0]->[0] = $res->[0];
         $_[0]->[1] = $res->[1];
     });
+}
+
+sub commit {
+    my($self, $session, $options) = @_;
+    if ($options->{expire}) {
+        $self->store->cleanup($options->{id});
+    } else {
+        $self->store->store($options->{id}, $session);
+    }
+}
+
+sub finalize {
+    my($self, $env, $response) = @_;
+
+    $self->commit($env->{'psgix.session'}, $env->{'psgix.session.options'});
+    if ($env->{'psgix.session.options'}->{expire}) {
+        $self->state->expire_session_id($env->{'psgix.session.options'}->{id}, $response);
+    } else {
+        $self->state->finalize($env->{'psgix.session.options'}->{id}, $response, $env->{'psgix.session.options'});
+    }
 }
 
 1;
@@ -80,10 +111,11 @@ Plack::Middleware::Session - Middleware for session management
 
   my $app = sub {
       my $env = shift;
+      my $session = $env->{'psgix.session'};
       return [
           200,
           [ 'Content-Type' => 'text/plain' ],
-          [ 'Hello, your Session ID is ' . $env->{'psgix.session'}->id ]
+          [ "Hello, you've been here for ", $session->{counter}++, "th time!" ],
       ];
   };
 
@@ -106,16 +138,15 @@ default it will use cookies to keep session state and store data in
 memory. This distribution also comes with other state and store
 solutions. See perldoc for these backends how to use them.
 
-It should be noted that we store the current session in the
-C<psgix.session> key inside the C<$env> where you can access it
-as needed. Additionally, as of version 0.09, you can call the
-C<session> method of a L<Plack::Request> instance to fetch
-whatever is stored in C<psgix.session>.
+It should be noted that we store the current session as a hash
+reference in the C<psgix.session> key inside the C<$env> where you can
+access it as needed.
 
-B<NOTE:> As of version 0.02 the session is stored in C<psgix.session>
-instead of C<plack.session>. We still keep a copy of it in
-C<plack.session>, but this is deprecated and will be removed
-in future versions.
+B<NOTE:> As of version 0.04 the session is stored in C<psgix.session>
+instead of C<plack.session>.
+
+Also, if you set I<session_class> option (see below), we create a
+session object out of the hash reference in C<plack.session>.
 
 =head2 State
 
@@ -185,9 +216,10 @@ L<Plack::Session::Store::Cache>.
 
 =item I<session_class>
 
-This can be used to override the actual session class. It currently
-defaults to L<Plack::Session> but you can substitute any class which
-implements the same interface.
+This can be used to create an actual session object in
+C<plack.session> environment. Defaults to none, which means the
+session object is not created but you can set C<Plack::Session> to
+create an object for you.
 
 =back
 

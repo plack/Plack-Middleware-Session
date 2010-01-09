@@ -15,7 +15,7 @@ use Plack::Session::State::Cookie;
 sub prepare_app {
     my $self = shift;
 
-    $self->session_class("Plack::Session");
+    Plack::Util::load_class($self->session_class) if $self->session_class;
     $self->session_key("plack_session") unless $self->session_key;
 
     my $state_cookie = Plack::Session::State::Cookie->new;
@@ -34,11 +34,7 @@ sub prepare_app {
             return $cookie;
         },
         expire_session_id => sub { $state_cookie->expire_session_id(@_) },
-        finalize => sub {
-            my($id, $response, $session) = @_;
-            my $cookie = $self->_serialize($session->dump);
-            $state_cookie->finalize($cookie, $response);
-        };
+        finalize => sub { $state_cookie->finalize(@_) };
 
     my $store = Plack::Util::inline_object
         fetch => sub {
@@ -51,6 +47,17 @@ sub prepare_app {
 
     $self->state($state);
     $self->store($store);
+}
+
+sub finalize {
+    my($self, $env, $response) = @_;
+
+    if ($env->{'psgix.session.options'}->{expire}) {
+        $self->state->expire_session_id($env->{'psgix.session.options'}->{id}, $response);
+    } else {
+        my $cookie = $self->_serialize($env->{'psgix.session'});
+        $self->state->finalize($cookie, $response, $env->{'psgix.session.options'});
+    }
 }
 
 sub _serialize {

@@ -56,7 +56,7 @@ sub generate {
 
 
 sub finalize {
-    my ($self, $id, $response) = @_;
+    my ($self, $id, $response, $options) = @_;
     ();
 }
 

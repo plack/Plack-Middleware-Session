@@ -13,11 +13,9 @@ my $app = sub {
     my $env = shift;
     my $session = $env->{'psgix.session'};
 
-    my $counter = $session->get('counter') || 0;
-    if ($counter >= 2) {
-        $session->expire;
-    } else {
-        $session->set(counter => $counter + 1);
+    my $counter = $session->{counter} || 0;
+    if ($session->{counter}++ >= 2) {
+        $env->{'psgix.session.options'}->{expire} = 1;
     }
 
     return [ 200, [], [ "counter=$counter" ] ];
