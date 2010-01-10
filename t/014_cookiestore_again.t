@@ -6,16 +6,14 @@ use warnings;
 use Test::More;
 
 use Plack::Request;
-use Plack::Session;
-use Plack::Session::State::Cookie;
-use Plack::Session::Store;
-use Plack::Util;
+use Plack::Middleware::Session::Cookie;
 
-use t::lib::TestSession;
+use t::lib::TestSessionHash;
 
-t::lib::TestSession::run_all_tests(
-    store  => Plack::Session::Store->new,
-    state  => Plack::Session::State::Cookie->new,
+t::lib::TestSessionHash::run_all_tests(
+    middleware_create_cb => sub {
+        Plack::Middleware::Session::Cookie->wrap( $_[0], secret => "foobar" );
+    },
     env_cb => sub {
         my $cookies = shift;
         open my $in, '<', \do { my $d };

@@ -6,22 +6,16 @@ use HTTP::Cookies;
 
 my $app = sub {
     my $env = shift;
-
-    isa_ok($env->{'plack.session'}, 't::MyCustomSession');
-
-    my $counter = $env->{'plack.session'}->get('counter') || 0;
+    my $counter = $env->{'psgix.session'}->{'counter'} || 0;
 
     my $body = "Counter=$counter";
     $counter++;
-    $env->{'plack.session'}->set(counter => $counter);
+    $env->{'psgix.session'}->{counter} = $counter;
 
     return [ 200, [], [ $body ] ];
 };
 
-$app = Plack::Middleware::Session->wrap(
-    $app,
-    session_class => 't::MyCustomSession'
-);
+$app = Plack::Middleware::Session->wrap($app);
 
 test_psgi $app, sub {
     my $cb = shift;

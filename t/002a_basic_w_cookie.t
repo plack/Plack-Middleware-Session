@@ -6,14 +6,13 @@ use warnings;
 use Test::More;
 
 use Plack::Request;
-use Plack::Session;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store;
 use Plack::Util;
 
-use t::lib::TestSession;
+use t::lib::TestSessionHash;
 
-t::lib::TestSession::run_all_tests(
+t::lib::TestSessionHash::run_all_tests(
     store  => Plack::Session::Store->new,
     state  => Plack::Session::State::Cookie->new,
     env_cb => sub {
