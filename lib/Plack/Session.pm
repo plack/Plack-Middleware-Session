@@ -9,8 +9,6 @@ use Plack::Util::Accessor qw( session options );
 
 sub new {
     my ($class, $env) = @_;
-    # NOTE: when you make a subclass, be sure to NEVER save $env in
-    # your hash. That will create a circular reference.
     bless {
         session => $env->{'psgix.session'},
         options => $env->{'psgix.session.options'},
@@ -74,11 +72,13 @@ Plack::Session - Middleware for session management
 =head1 SYNOPSIS
 
   # Use with Middleware::Session
-  enable "Session", session_class => "Plack::Session";
+  enable "Session";
 
+  # later in your app
+  use Plack::Session;
   my $app = sub {
       my $env = shift;
-      my $session = $env->{'plack.session'}; # not psgix.
+      my $session = Plack::Session->new($env);
 
       $session->id;
       $session->get($key);

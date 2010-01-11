@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Plack::Middleware::Session;
+use Plack::Session;
 
 sub create_session {
     my($mw, $env) = @_;
@@ -12,7 +13,7 @@ sub create_session {
     my $session;
     my $app = sub {
         my $env = shift;
-        $session = $env->{'plack.session'};
+        $session = Plack::Session->new($env);
         return sub {
             my $responder = shift;
             $responder->([ 200, [], [] ]);
@@ -39,7 +40,7 @@ sub run_all_tests {
         response_test
     ]};
 
-    my $m = sub { Plack::Middleware::Session->wrap($_[0], session_class => "Plack::Session", state => $state, store => $storage) };
+    my $m = sub { Plack::Middleware::Session->wrap($_[0], state => $state, store => $storage) };
 
     $response_test ||= sub {
         my($res_cb, $session_id, $check_expired) = @_;

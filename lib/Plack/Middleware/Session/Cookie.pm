@@ -15,7 +15,6 @@ use Plack::Session::State::Cookie;
 sub prepare_app {
     my $self = shift;
 
-    Plack::Util::load_class($self->session_class) if $self->session_class;
     $self->session_key("plack_session") unless $self->session_key;
 
     $self->state( Plack::Session::State::Cookie->new );

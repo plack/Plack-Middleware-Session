@@ -13,7 +13,6 @@ use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw(
     state
     store
-    session_class
 );
 
 sub prepare_app {
@@ -22,8 +21,6 @@ sub prepare_app {
     $self->state( 'Cookie' ) unless $self->state;
     $self->state( $self->inflate_backend('Plack::Session::State', $self->state) );
     $self->store( $self->inflate_backend('Plack::Session::Store', $self->store) );
-
-    Plack::Util::load_class($self->session_class) if $self->session_class;
 }
 
 sub inflate_backend {
@@ -51,10 +48,6 @@ sub call {
     }
 
     $env->{'psgix.session.options'} = { id => $id };
-
-    if ($self->session_class) {
-        $env->{'plack.session'} = $self->session_class->new($env);
-    }
 
     my $res = $self->app->($env);
     $self->response_cb($res, sub { $self->finalize($env, $_[0]) });
@@ -161,9 +154,6 @@ access it as needed.
 B<NOTE:> As of version 0.04 the session is stored in C<psgix.session>
 instead of C<plack.session>.
 
-Also, if you set I<session_class> option (see below), we create a
-session object out of the hash reference in C<plack.session>.
-
 =head2 State
 
 =over 4
@@ -229,13 +219,6 @@ It should be noted that this default is an in-memory volatile store
 is only suitable for development (or single process servers). For a
 more robust solution see L<Plack::Session::Store::File> or
 L<Plack::Session::Store::Cache>.
-
-=item I<session_class>
-
-This can be used to create an actual session object in
-C<plack.session> environment. Defaults to none, which means the
-session object is not created but you can set C<Plack::Session> to
-create an object for you.
 
 =back
 
