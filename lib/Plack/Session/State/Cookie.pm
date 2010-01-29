@@ -18,12 +18,12 @@ use Plack::Util::Accessor qw[
 
 sub get_session_id {
     my ($self, $env) = @_;
-    ( Plack::Request->new($env)->cookie( $self->session_key ) || return )->value;
+    Plack::Request->new($env)->cookies->{$self->session_key};
 }
 
 sub expire_session_id {
     my ($self, $id, $res, $options) = @_;
-    $self->_set_cookie($id, $res, expires => 0);
+    $self->_set_cookie($id, $res, expires => time);
 }
 
 sub finalize {
