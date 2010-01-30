@@ -1,5 +1,14 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.09_01 Sat Jan 30 13:39:21 PST 2010
+    * Reworked the internal code and API a lot, so Session persistence
+      and retrieval are handled in a more stateless way
+    * INCOMPATIBLE: psgix.session is now a hash reference rather than an object.
+      If you need an object like before, do:
+        use Plack::Session; $session = Plack::Session->new($env);
+    * Added Plack::Middleware::Session::Cookie which uses CookieStore
+    * Updated Cookie handling code to work with Plack 0.99 and later
+
 0.03 Thurs. Jan. 7, 2009
     * Plack::Middleware::Session
       - change plack.session to psgix.session (plack.session is
