@@ -14,6 +14,7 @@ use Plack::Util::Accessor qw[
     domain
     expires
     secure
+    httponly
 ];
 
 sub get_session_id {
@@ -21,14 +22,33 @@ sub get_session_id {
     Plack::Request->new($env)->cookies->{$self->session_key};
 }
 
+sub merge_options {
+    my($self, %options) = @_;
+
+    delete $options{id};
+
+    $options{path}     = $self->path || '/' if !exists $options{path} && defined $self->path;
+    $options{domain}   = $self->domain      if !exists $options{domain} && defined $self->domain;
+    $options{secure}   = $self->secure      if !exists $options{secure} && defined $self->secure;
+    $options{httponly} = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
+
+    if (!exists $options{expires} && defined $self->expires) {
+        $options{expires} = time + $self->expires;
+    }
+
+    return %options;
+}
+
 sub expire_session_id {
     my ($self, $id, $res, $options) = @_;
-    $self->_set_cookie($id, $res, expires => time);
+    my %opts = $self->merge_options(%$options, expires => time);
+    $self->_set_cookie($id, $res, %opts);
 }
 
 sub finalize {
     my ($self, $id, $res, $options) = @_;
-    $self->_set_cookie($id, $res, (defined $self->expires ? (expires => time + $self->expires) : ()));
+    my %opts = $self->merge_options(%$options);
+    $self->_set_cookie($id, $res, %opts);
 }
 
 sub _set_cookie {
@@ -38,9 +58,6 @@ sub _set_cookie {
     my $response = Plack::Response->new($res);
     $response->cookies->{ $self->session_key } = +{
         value => $id,
-        path  => ($self->path || '/'),
-        ( defined $self->domain  ? ( domain  => $self->domain  ) : () ),
-        ( defined $self->secure  ? ( secure  => $self->secure  ) : () ),
         %options,
     };
 
