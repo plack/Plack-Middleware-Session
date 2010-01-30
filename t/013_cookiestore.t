@@ -38,7 +38,7 @@ test_psgi ua => $ua, app => $app, client => sub {
     $res = $cb->(GET "/");
     is $res->content, "counter=2";
 
-    my $res = $cb->(GET "/");
+    $res = $cb->(GET "/");
     is $res->content, "counter=0";
 };
 
