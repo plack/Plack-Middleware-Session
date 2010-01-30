@@ -21,7 +21,7 @@ my $app = sub {
     return [ 200, [], [ "counter=$counter" ] ];
 };
 
-$app = Plack::Middleware::Session::Cookie->wrap($app, secret => "foobar");
+$app = Plack::Middleware::Session::Cookie->wrap($app, secret => "foobar", expires => 3600);
 
 my $ua = LWP::UserAgent->new;
 $ua->cookie_jar( HTTP::Cookies->new );
@@ -31,9 +31,11 @@ test_psgi ua => $ua, app => $app, client => sub {
 
     my $res = $cb->(GET "/");
     is $res->content, "counter=0";
+    like $res->header('Set-Cookie'), qr/expires=/;
 
     $res = $cb->(GET "/");
     is $res->content, "counter=1";
+    like $res->header('Set-Cookie'), qr/expires=/;
 
     $res = $cb->(GET "/");
     is $res->content, "counter=2";

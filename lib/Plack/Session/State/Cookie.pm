@@ -28,7 +28,7 @@ sub expire_session_id {
 
 sub finalize {
     my ($self, $id, $res, $options) = @_;
-    $self->_set_cookie($id, $res, (defined $self->expires ? (expires => $self->expires) : ()));
+    $self->_set_cookie($id, $res, (defined $self->expires ? (expires => time + $self->expires) : ()));
 }
 
 sub _set_cookie {
@@ -99,8 +99,9 @@ be included in the cookie.
 
 =item B<expires>
 
-Expiration time of the cookie, if nothing is supplied then it will
-not be included in the cookie.
+Expiration time of the cookie in seconds, if nothing is supplied then
+it will not be included in the cookie, which means the session expires
+per browser session.
 
 =item B<secure>
 
