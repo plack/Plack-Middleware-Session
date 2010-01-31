@@ -55,7 +55,7 @@ sub _set_cookie {
     my($self, $id, $res, %options) = @_;
 
     # TODO: Do not use Plack::Response
-    my $response = Plack::Response->new($res);
+    my $response = Plack::Response->new(@$res);
     $response->cookies->{ $self->session_key } = +{
         value => $id,
         %options,
