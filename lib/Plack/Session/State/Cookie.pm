@@ -27,10 +27,11 @@ sub merge_options {
 
     delete $options{id};
 
-    $options{path}     = $self->path || '/' if !exists $options{path} && defined $self->path;
+    $options{path}     = $self->path || '/' if !exists $options{path};
     $options{domain}   = $self->domain      if !exists $options{domain} && defined $self->domain;
     $options{secure}   = $self->secure      if !exists $options{secure} && defined $self->secure;
     $options{httponly} = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
+
 
     if (!exists $options{expires} && defined $self->expires) {
         $options{expires} = time + $self->expires;

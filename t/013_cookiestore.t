@@ -32,6 +32,7 @@ test_psgi ua => $ua, app => $app, client => sub {
     my $res = $cb->(GET "/");
     is $res->content, "counter=0";
     like $res->header('Set-Cookie'), qr/expires=/;
+    like $res->header('Set-Cookie'), qr/path=\//;
 
     $res = $cb->(GET "/");
     is $res->content, "counter=1";
