@@ -2,7 +2,7 @@ package Plack::Session::State::Cookie;
 use strict;
 use warnings;
 
-our $VERSION   = '0.09_02';
+our $VERSION   = '0.09_03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use parent 'Plack::Session::State';
