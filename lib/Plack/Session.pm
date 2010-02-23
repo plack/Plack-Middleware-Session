@@ -2,7 +2,7 @@ package Plack::Session;
 use strict;
 use warnings;
 
-our $VERSION   = '0.09_03';
+our $VERSION   = '0.10';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util::Accessor qw( session options );

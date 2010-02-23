@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.10 Mon Feb 22 19:03:17 PST 2010
+    - Make this a non-dev release now Plack 0.9910 is out
+
 0.09_03 Tue Feb  2 20:42:56 PST 2010
     - Fixed so the default Cookie path is now correctly set to '/'
       You can override that by setting path = undef in psgix.session.options.

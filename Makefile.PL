@@ -7,8 +7,7 @@ all_from 'lib/Plack/Middleware/Session.pm';
 license 'perl';
 
 # prereqs
-requires 'Plack'            => '0.99_01';
-requires 'Plack::Request'   => '0.09';
+requires 'Plack'            => '0.9910';
 
 # for session ID gen
 requires 'Digest::SHA1'      => '0';
