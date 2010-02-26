@@ -18,12 +18,8 @@ use Plack::Util::Accessor qw[ dbh table_name serializer deserializer ];
 sub new {
     my ($class, %params) = @_;
 
-    # XXX TODO: Somebody will most likely want to use a pre-cooked
-    # dbh to be used as the database handle.
-
-    my $connect_info = $params{connect_info};
-    if (! $connect_info || ref $connect_info ne 'ARRAY' ) {
-        die "DBI connect_info was not available, or is not an arrayref";
+    if (! $params{dbh} ) {
+        die "DBI instance was not available in the argument list";
     }
 
     $params{table_name}   ||= 'sessions';
@@ -39,8 +35,8 @@ sub new {
 
 sub _prepare_dbh {
     my $self = shift;
-    my $dbh = DBI->connect(@{ $self->{connect_info} });
 
+    my $dbh = $self->{dbh};
     # These are pre-cooked, so we can efficiently execute them upon request
     my $table_name = $self->{table_name};
     my %sql = (
@@ -110,6 +106,52 @@ sub remove {
 
 __END__
 
+=head1 NAME
+
+Plack::Session::Store::DBI - DBI-based session store
+
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+  use Plack::Middleware::Session;
+  use Plack::Session::Store::DBI;
+
+  my $app = sub {
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+  };
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::DBI->new(
+              dbh => DBI->connect( @connect_args )
+          );
+      $app;
+  };
+
+  # with custom serializer/deserializer
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::File->new(
+              dbh => DBI->connect( @connect_args )
+              # YAML takes it's args the opposite order
+              serializer   => sub { YAML::DumpFile( reverse @_ ) },
+              deserializer => sub { YAML::LoadFile( @_ ) },
+          );
+      $app;
+  };
+
+=head1 DESCRIPTION
+
+This implements a DBI based storage for session data. By
+default it will use L<Storable> and L<MIME::Base64> to serialize and 
+deserialize the data, but this can be configured easily. 
+
+This is a subclass of L<Plack::Session::Store> and implements
+it's full interface.
+
+=head1 SESSION TABLE SCHEMA
+
 Your session table must have at least the following schema structure:
 
     CREATE TABLE sessions (
@@ -120,9 +162,18 @@ Your session table must have at least the following schema structure:
 Note that MySQL TEXT fields only store 64KB, so if your session data
 will exceed that size you'll want to move to MEDIUMTEXT, MEDIUMBLOB,
 or larger.
-    
 
 =head1 AUTHORS
 
 Many aspects of this module were partially based upon Catalyst::Plugin::Session::Store::DBI
+
+Daisuke Maki
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009, 2010 Daisuke Maki C<< <daisuke@endeworks.jp> >>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+=cut
 
