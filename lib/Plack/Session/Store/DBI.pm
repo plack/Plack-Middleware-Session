@@ -131,7 +131,7 @@ Plack::Session::Store::DBI - DBI-based session store
 
   builder {
       enable 'Session',
-          store => Plack::Session::Store::File->new(
+          store => Plack::Session::Store::DBI->new(
               dbh => DBI->connect( @connect_args )
               # YAML takes it's args the opposite order
               serializer   => sub { YAML::DumpFile( reverse @_ ) },
