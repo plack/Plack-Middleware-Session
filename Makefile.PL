@@ -15,6 +15,7 @@ requires 'Digest::SHA1'      => '0';
 # things the tests need
 build_requires 'Test::More' => '0.88';
 build_requires 'Test::Requires' => '0';
+test_requires 'Test::Exception';
 
 tests_recursive;
 auto_install;
