@@ -7,7 +7,6 @@ use warnings;
 our $VERSION   = '0.10';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use DBI;
 use MIME::Base64 ();
 use Storable ();
 
