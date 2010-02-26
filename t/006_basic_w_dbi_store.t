@@ -5,7 +5,7 @@ use warnings;
 use File::Spec;
 use File::Temp qw(tempdir);
 
-use Test::Requires qw(DBI DBD::SQLite);
+use Test::Requires qw(DBI DBD::SQLite MIME::Base64 Storable);
 use Test::More;
 
 use Plack::Request;
@@ -24,10 +24,9 @@ CREATE TABLE sessions (
     session_data TEXT
 );
 EOSQL
-$dbh->disconnect;
 
 t::lib::TestSession::run_all_tests(
-    store  => Plack::Session::Store::DBI->new( connect_info => [ "dbi:SQLite:dbname=$file" ] ),
+    store  => Plack::Session::Store::DBI->new( dbh => $dbh ),
     state  => Plack::Session::State->new,
     env_cb => sub {
         open my $in, '<', \do { my $d };
@@ -43,5 +42,6 @@ t::lib::TestSession::run_all_tests(
     },
 );
 
+$dbh->disconnect;
 
 done_testing;
