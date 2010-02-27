@@ -2,7 +2,7 @@ package Plack::Middleware::Session;
 use strict;
 use warnings;
 
-our $VERSION   = '0.10';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util;
