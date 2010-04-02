@@ -199,7 +199,7 @@ you can use this noop module.
 
 =head1 OPTIONS
 
-The following are options that can be passed to this mdoule.
+The following are options that can be passed to this module.
 
 =over 4
 
