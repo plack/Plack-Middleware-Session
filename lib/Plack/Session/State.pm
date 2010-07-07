@@ -109,7 +109,7 @@ however in both cases a default will be provided for you.
 
 =item B<session_key>
 
-This is the name of the session key, it default to 'plack_session'.
+This is the name of the session key, it defaults to 'plack_session'.
 
 =item B<sid_generator>
 
@@ -155,7 +155,7 @@ instance or an object with an equivalent interface.
 =item B<finalize ( $session_id, $response )>
 
 Given a C<$session_id> and a C<$response> this will perform any
-finalization nessecary to preserve state. This method is called by
+finalization necessary to preserve state. This method is called by
 the L<Plack::Session> C<finalize> method. The C<$response> is expected
 to be a L<Plack::Response> instance or an object with an equivalent
 interface.

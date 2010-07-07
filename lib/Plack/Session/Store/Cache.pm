@@ -73,7 +73,7 @@ L<Cache> interface. This offers a lot of flexibility due to the many
 excellent L<Cache>, L<Cache::Cache> and L<CHI> drivers available.
 
 This is a subclass of L<Plack::Session::Store> and implements
-it's full interface.
+its full interface.
 
 =head1 METHODS
 

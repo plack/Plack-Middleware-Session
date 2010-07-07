@@ -102,7 +102,7 @@ default it will use L<Storable> to serialize and deserialize the
 data, but this can be configured easily. 
 
 This is a subclass of L<Plack::Session::Store> and implements
-it's full interface.
+its full interface.
 
 =head1 METHODS
 

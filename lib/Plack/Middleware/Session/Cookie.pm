@@ -99,7 +99,7 @@ own secret string.
 
 =item session_key, domain, expires, path, secure
 
-Accessors for the cookie attribuets. See
+Accessors for the cookie attributes. See
 L<Plack::Session::State::Cookie> for these options.
 
 =back

@@ -92,7 +92,7 @@ Plack::Session::State::Cookie - Basic cookie-based session state
 
 =head1 DESCRIPTION
 
-This is a subclass of L<Plack::Session::State> and implements it's
+This is a subclass of L<Plack::Session::State> and implements its
 full interface. This is the default state used in
 L<Plack::Middleware::Session>.
 

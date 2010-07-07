@@ -43,7 +43,7 @@ L<Plack::Session> requires a C<store> instance, so you can use this
 one and all methods will return null.
 
 This is a subclass of L<Plack::Session::Store> and implements
-it's full interface.
+its full interface.
 
 =head1 BUGS
 
