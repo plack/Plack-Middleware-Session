@@ -2,7 +2,7 @@ package Plack::Middleware::Session::Cookie;
 use strict;
 use parent qw(Plack::Middleware::Session);
 
-use Plack::Util::Accessor qw(secret session_key domain expires path secure);
+use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly);
 
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();
@@ -18,7 +18,7 @@ sub prepare_app {
     $self->session_key("plack_session") unless $self->session_key;
 
     $self->state( Plack::Session::State::Cookie->new );
-    for my $attr (qw(session_key path domain expires secure)) {
+    for my $attr (qw(session_key path domain expires secure httponly)) {
         $self->state->$attr($self->$attr);
     }
 }
@@ -97,7 +97,7 @@ Server side secret to sign the session data using HMAC SHA1. Defaults
 to nothing (i.e. do not sign) but B<strongly recommended> to set your
 own secret string.
 
-=item session_key, domain, expires, path, secure
+=item session_key, domain, expires, path, secure, httponly
 
 Accessors for the cookie attributes. See
 L<Plack::Session::State::Cookie> for these options.
