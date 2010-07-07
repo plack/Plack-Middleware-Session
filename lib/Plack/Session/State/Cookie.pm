@@ -102,8 +102,8 @@ L<Plack::Middleware::Session>.
 
 =item B<new ( %params )>
 
-The C<%params> can include I<path>, I<domain>, I<expires> and
-I<secure> options, as well as all the options accepted by
+The C<%params> can include I<path>, I<domain>, I<expires>, I<secure>,
+and I<httponly> options, as well as all the options accepted by
 L<Plack::Session::Store>.
 
 =item B<path>
@@ -124,6 +124,11 @@ per browser session.
 =item B<secure>
 
 Secure flag for the cookie, if nothing is supplied then it will not
+be included in the cookie.
+
+=item B<httponly>
+
+HttpOnly flag for the cookie, if nothing is supplied then it will not
 be included in the cookie.
 
 =back
