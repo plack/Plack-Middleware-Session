@@ -12,6 +12,9 @@ requires 'Plack'            => '0.9910';
 # for session ID gen
 requires 'Digest::SHA1'      => '0';
 
+# for integrity verification
+requires 'Digest::HMAC_SHA1' => '0';
+
 # things the tests need
 build_requires 'Test::More' => '0.88';
 build_requires 'Test::Requires' => '0';
