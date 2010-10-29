@@ -75,6 +75,10 @@ sub commit {
 
     if ($options->{expire}) {
         $self->store->remove($options->{id});
+    } elsif ($options->{change_id}) {
+        $self->store->remove($options->{id});
+        $options->{id} = $self->generate_id($env);
+        $self->store->store($options->{id}, $session);
     } else {
         $self->store->store($options->{id}, $session);
     }
