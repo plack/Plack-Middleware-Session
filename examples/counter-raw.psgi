@@ -7,7 +7,7 @@
 # (integrated via subclassing Plack::Request) and Dancer::Session::PSGI
 # how to adapt Plack::Middleware::Session to web frameworks API.
 
-# You're not recommended to write a new web applicaiton using this style.
+# You're not recommended to write a new web application using this style.
 
 use strict;
 use Plack::Session;
