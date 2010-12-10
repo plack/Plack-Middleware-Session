@@ -1,5 +1,15 @@
 #!/usr/bin/perl
+# Simple counter web application
 
+# NOTE: This example uses Plack::Request to illustrate how
+# Plack::Middleware::Session interface ($env->{'psgix.session'}) could
+# be wrapped and integrated as part of the request API. See Tatsumaki
+# (integrated via subclassing Plack::Request) and Dancer::Session::PSGI
+# how to adapt Plack::Middleware::Session to web frameworks API.
+
+# You're not recommended to write a new web applicaiton using this style.
+
+use strict;
 use Plack::Session;
 use Plack::Session::State;
 use Plack::Session::State::Cookie;
