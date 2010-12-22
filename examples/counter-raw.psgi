@@ -5,7 +5,7 @@
 # Plack::Middleware::Session interface ($env->{'psgix.session'}) could
 # be wrapped and integrated as part of the request API. See Tatsumaki
 # (integrated via subclassing Plack::Request) and Dancer::Session::PSGI
-# how to adapt Plack::Middleware::Session to web frameworks API.
+# how to adapt Plack::Middleware::Session to web frameworks' APIs.
 
 # You're not recommended to write a new web application using this style.
 

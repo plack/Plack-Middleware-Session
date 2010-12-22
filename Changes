@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.13 Wed Dec 22 08:56:52 PST 2010
+    - Added WARNINGS to deprecate request parameter based session state from the default state
+    - Added 'change_id' option for paranoids against session fixation (s-aska, nihen)
+
 0.12 Wed Jul  7 15:54:05 PDT 2010
     - Improved documents (markstos, haarg)
     - Support httponly option (haarg)        
