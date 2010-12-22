@@ -98,6 +98,15 @@ all B<Plack::Session::State::*> modules. You will only
 need to override a couple methods if you do subclass. See
 L<Plack::Session::State::Cookie> for an example of this.
 
+B<WARNING>: parameter based session ID management makes session
+fixation really easy, and that makes your website vulnerable. You
+should really avoid using this state in the production environment
+except when you have to deal with legacy HTTP clients that do not
+support cookies.
+
+In the future this parameter based state handling will be removed from
+this base class and will be moved to its own State class.
+
 =head1 METHODS
 
 =over 4
