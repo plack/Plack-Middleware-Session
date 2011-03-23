@@ -12,13 +12,13 @@ use Storable ();
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ dbh table_name serializer deserializer ];
+use Plack::Util::Accessor qw[ dbh get_dbh table_name serializer deserializer ];
 
 sub new {
     my ($class, %params) = @_;
 
-    if (! $params{dbh} ) {
-        die "DBI instance was not available in the argument list";
+    if (! $params{dbh} && ! $params{get_dbh}) {
+        die "DBI instance or a callback was not available in the argument list";
     }
 
     $params{table_name}   ||= 'sessions';
@@ -32,7 +32,8 @@ sub new {
 }
 
 sub _dbh {
-    shift->{dbh};
+    my $self =shift;
+    ( exists $self->{get_dbh} ) ? $self->{get_dbh}->() : $self->{dbh};
 }
 
 sub fetch {
@@ -107,6 +108,16 @@ Plack::Session::Store::DBI - DBI-based session store
       $app;
   };
 
+  # set get_dbh callback for ondemand
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::DBI->new(
+              get_dbh => sub { DBI->connect( @connect_args ) }
+          );
+      $app;
+  };
+  
   # with custom serializer/deserializer
 
   builder {
