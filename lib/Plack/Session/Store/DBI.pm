@@ -28,43 +28,18 @@ sub new {
         sub { Storable::thaw( MIME::Base64::decode_base64( $_[0] ) ) };
 
     my $self = bless { %params }, $class;
-    $self->_prepare_dbh();
     return $self;
 }
 
-sub _prepare_dbh {
-    my $self = shift;
-
-    my $dbh = $self->{dbh};
-    # These are pre-cooked, so we can efficiently execute them upon request
-    my $table_name = $self->{table_name};
-    my %sql = (
-        get_session    =>
-            "SELECT session_data FROM $table_name WHERE id = ?",
-
-        delete_session =>
-            "DELETE FROM $table_name WHERE id = ?",
-
-        # XXX argument list order matters for insert and update!
-        # (they should match, so we can execute them the same way)
-        # If you change this, be sure to change store() as well.
-        insert_session => 
-            "INSERT INTO $table_name (session_data, id) VALUES (?, ?)",
-        update_session =>
-            "UPDATE $table_name SET session_data = ? WHERE id = ?",
-
-        check_session => 
-            "SELECT 1 FROM $table_name WHERE id = ?",
-    );
-
-    while (my ($name, $sql) = each %sql ) {
-        $self->{"_sth_$name"} = $dbh->prepare($sql);
-    }
+sub _dbh {
+    shift->{dbh};
 }
 
 sub fetch {
     my ($self, $session_id) = @_;
-    my $sth = $self->{_sth_get_session};
+    my $table_name = $self->{table_name};
+    my $dbh = $self->_dbh;
+    my $sth = $dbh->prepare_cached("SELECT session_data FROM $table_name WHERE id = ?");
     $sth->execute( $session_id );
     my ($data) = $sth->fetchrow_array();
     $sth->finish;
@@ -73,13 +48,12 @@ sub fetch {
 
 sub store {
     my ($self, $session_id, $session) = @_;
+    my $table_name = $self->{table_name};
 
     # XXX To be honest, I feel like there should be a transaction 
     # call here.... but Catalyst didn't have it, so I'm not so sure
 
-    my $sth;
-
-    $sth = $self->{_sth_check_session};
+    my $sth = $self->_dbh->prepare_cached("SELECT 1 FROM $table_name WHERE id = ?");
     $sth->execute($session_id);
 
     # need to fetch. on some DBD's execute()'s return status and
@@ -88,15 +62,21 @@ sub store {
 
     $sth->finish;
     
-    $sth = ($exists) ?
-        $self->{_sth_update_session} : $self->{_sth_insert_session};
-
-    $sth->execute( $self->serializer->($session), $session_id );
+    if ($exists) {
+        my $sth = $self->_dbh->prepare_cached("UPDATE $table_name SET session_data = ? WHERE id = ?");
+        $sth->execute( $self->serializer->($session), $session_id );
+    }
+    else {
+        my $sth = $self->_dbh->prepare_cached("INSERT INTO $table_name (id, session_data) VALUES (?, ?)");
+        $sth->execute( $session_id , $self->serializer->($session) );
+    }
+    
 }
 
 sub remove {
     my ($self, $session_id) = @_;
-    my $sth = $self->{_sth_delete_session};
+    my $table_name = $self->{table_name};
+    my $sth = $self->_dbh->prepare_cached("DELETE FROM $table_name WHERE id = ?");
     $sth->execute( $session_id );
     $sth->finish;
 }
