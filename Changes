@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.14 Tue Mar 29 13:48:42 PDT 2011
+    - Support get_dbh callback in Store::DBI (kazeburo)
+
 0.13 Wed Dec 22 08:56:52 PST 2010
     - Added WARNINGS to deprecate request parameter based session state from the default state
     - Added 'change_id' option for paranoids against session fixation (s-aska, nihen)
