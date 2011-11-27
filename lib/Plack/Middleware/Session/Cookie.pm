@@ -2,7 +2,8 @@ package Plack::Middleware::Session::Cookie;
 use strict;
 use parent qw(Plack::Middleware::Session);
 
-use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly);
+use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
+                             serializer deserializer);
 
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();
@@ -16,6 +17,12 @@ sub prepare_app {
     my $self = shift;
 
     $self->session_key("plack_session") unless $self->session_key;
+
+    $self->serializer(sub {MIME::Base64::encode(Storable::nfreeze($_[0]), '' )})
+      unless $self->serializer;
+
+    $self->deserializer(sub {Storable::thaw(MIME::Base64::decode($_[0]))})
+      unless $self->deserializer;
 
     $self->state( Plack::Session::State::Cookie->new );
     for my $attr (qw(session_key path domain expires secure httponly)) {
@@ -33,7 +40,7 @@ sub get_session {
 
     # NOTE: do something with $time?
 
-    my $session = Storable::thaw(MIME::Base64::decode($b64));
+    my $session = $self->deserializer->($b64);
     return ($self->generate_id, $session);
 }
 
@@ -54,7 +61,7 @@ sub save_state {
 sub _serialize {
     my($self, $id, $session) = @_;
 
-    my $b64 = MIME::Base64::encode( Storable::freeze($session), '' );
+    my $b64 = $self->serializer->($session);
     join ":", $id, $b64, $self->sig($b64);
 }
 
