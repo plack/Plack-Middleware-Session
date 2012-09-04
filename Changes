@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.15 Tue Sep  4 14:15:13 PDT 2012
+    - Fixed CPAN dependencies
+
 0.14 Tue Mar 29 13:48:42 PDT 2011
     - Support get_dbh callback in Store::DBI (kazeburo)
 
