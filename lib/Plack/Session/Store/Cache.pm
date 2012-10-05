@@ -9,7 +9,7 @@ use Scalar::Util qw[ blessed ];
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ cache get_cache expires ];
+use Plack::Util::Accessor qw[ cache get_cache expires prefix ];
 
 sub new {
     my ($class, %params) = @_;
@@ -38,17 +38,17 @@ sub new {
 
 sub fetch {
     my ($self, $session_id ) = @_;
-    $self->get_cache->()->get($session_id);
+    $self->get_cache->()->get($self->prefix . $session_id);
 }
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->get_cache->()->set($session_id => $session, $self->expires);
+    $self->get_cache->()->set($self->prefix . $session_id => $session, $self->expires);
 }
 
 sub remove {
     my ($self, $session_id) = @_;
-    $self->get_cache->()->remove($session_id);
+    $self->get_cache->()->remove($self->prefix . $session_id);
 }
 
 1;
@@ -76,6 +76,7 @@ Plack::Session::Store::Cache - Cache session store
           store => Plack::Session::Store::Cache->new(
               cache   => CHI->new(driver => 'FastMmap'),
               expires => 86400,
+              prefix  => 'session:',
           );
       $app;
   };
@@ -84,7 +85,7 @@ Plack::Session::Store::Cache - Cache session store
   builder {
       enable 'Session',
           store => Plack::Session::Store::Cache->new(
-              get_cache => sub { MyAppSingleton->cache }
+              get_cache => sub { MyAppSingleton->cache },
           );
       $app;
   };
@@ -121,6 +122,10 @@ A callback for the cache handle.
 This value uses in set method, Like this
 
  $cache->set($key, $data, $expires)
+
+=item B<prefix>
+
+The prefix associated with this cache. Defaults to "" if not explicitly set.
 
 =back
 
