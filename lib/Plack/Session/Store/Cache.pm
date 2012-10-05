@@ -9,7 +9,7 @@ use Scalar::Util qw[ blessed ];
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ cache ];
+use Plack::Util::Accessor qw[ cache prefix ];
 
 sub new {
     my ($class, %params) = @_;
@@ -20,22 +20,25 @@ sub new {
             && $params{cache}->can('set')
             && $params{cache}->can('remove');
 
-    bless { %params } => $class;
+    bless {
+        prefix => '',
+        %params,
+    } => $class;
 }
 
 sub fetch {
     my ($self, $session_id ) = @_;
-    $self->cache->get($session_id);
+    $self->cache->get($self->prefix . $session_id);
 }
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->cache->set($session_id => $session);
+    $self->cache->set($self->prefix . $session_id => $session);
 }
 
 sub remove {
     my ($self, $session_id) = @_;
-    $self->cache->remove($session_id);
+    $self->cache->remove($self->prefix . $session_id);
 }
 
 1;
@@ -61,7 +64,8 @@ Plack::Session::Store::Cache - Cache session store
   builder {
       enable 'Session',
           store => Plack::Session::Store::Cache->new(
-              cache => CHI->new(driver => 'FastMmap')
+              cache  => CHI->new(driver => 'FastMmap'),
+              prefix => 'session:',
           );
       $app;
   };
@@ -88,6 +92,10 @@ exception if that is not the case.
 =item B<cache>
 
 A simple accessor for the cache handle.
+
+=item B<prefix>
+
+The prefix associated with this cache. Defaults to "" if not explicitly set.
 
 =back
 
