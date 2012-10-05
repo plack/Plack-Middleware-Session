@@ -9,7 +9,7 @@ use Scalar::Util qw[ blessed ];
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ cache get_cache ];
+use Plack::Util::Accessor qw[ cache get_cache expires ];
 
 sub new {
     my ($class, %params) = @_;
@@ -43,7 +43,7 @@ sub fetch {
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->get_cache->()->set($session_id => $session);
+    $self->get_cache->()->set($session_id => $session, $self->expires);
 }
 
 sub remove {
@@ -74,7 +74,8 @@ Plack::Session::Store::Cache - Cache session store
   builder {
       enable 'Session',
           store => Plack::Session::Store::Cache->new(
-              cache => CHI->new(driver => 'FastMmap')
+              cache   => CHI->new(driver => 'FastMmap'),
+              expires => 86400,
           );
       $app;
   };
@@ -114,6 +115,12 @@ A simple accessor for the cache handle.
 =item B<get_cache>
 
 A callback for the cache handle.
+
+=item B<expires>
+
+This value uses in set method, Like this
+
+ $cache->set($key, $data, $expires)
 
 =back
 
