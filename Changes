@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.16 Sun Feb 10 11:41:14 PST 2013
+    - Fix minimum version requirement for Test::Fatal
+
 0.15 Tue Sep  4 14:15:13 PDT 2012
     - Fixed CPAN dependencies
 
