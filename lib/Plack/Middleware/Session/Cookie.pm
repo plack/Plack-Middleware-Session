@@ -30,13 +30,25 @@ sub prepare_app {
     }
 }
 
+sub _compare {
+    my($s1, $s2) = @_;
+
+    return if length $s1 != length $s2;
+    my $r = 0;
+    for my $i (0..length($s1) - 1) {
+        $r |= ord(substr $s1, $i) ^ ord(substr $s2, $i);
+    }
+
+    return $r == 0;
+}
+
 sub get_session {
     my($self, $request) = @_;
 
     my $cookie = $self->state->get_session_id($request) or return;
 
     my($time, $b64, $sig) = split /:/, $cookie, 3;
-    $self->sig($b64) eq $sig or return;
+    _compare($self->sig($b64), $sig) or return;
 
     # NOTE: do something with $time?
 
