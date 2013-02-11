@@ -1,4 +1,5 @@
 .DS_Store
-MANIFEST
+MANIFEST.SKIP
 META\.*
+MYMETA\.*
 *~
