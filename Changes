@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
+0.18 Tue Feb 12 02:56:23 PST 2013
+    - Repackaging
+
 0.17 Mon Feb 11 15:40:50 PST 2013
     - Use constant time comparison of HMAC signature to be precautious for timing attacks
 
