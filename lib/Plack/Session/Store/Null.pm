@@ -2,7 +2,7 @@ package Plack::Session::Store::Null;
 use strict;
 use warnings;
 
-our $VERSION   = '0.18';
+our $VERSION   = '0.19';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub new     { bless {} => shift }
