@@ -1,59 +1,102 @@
 # NAME
 
-Plack::Session - Middleware for session management
+Plack::Middleware::Session - Middleware for session management
 
 # SYNOPSIS
 
-    # Use with Middleware::Session
-    enable "Session";
+    use Plack::Builder;
 
-    # later in your app
-    use Plack::Session;
     my $app = sub {
         my $env = shift;
-        my $session = Plack::Session->new($env);
+        my $session = $env->{'psgix.session'};
+        return [
+            200,
+            [ 'Content-Type' => 'text/plain' ],
+            [ "Hello, you've been here for ", $session->{counter}++, "th time!" ],
+        ];
+    };
 
-      $session->id;
-      $session->get($key);
-      $session->set($key, $value);
-      $session->remove($key);
-      $session->keys;
+    builder {
+        enable 'Session';
+        $app;
+    };
 
-        $session->expire;
+    # Or, use the File store backend (great if you use multiprocess server)
+    # For more options, see perldoc Plack::Session::Store::File
+    builder {
+        enable 'Session', store => 'File';
+        $app;
     };
 
 # DESCRIPTION
 
-This is the core session object, you probably want to look
-at [Plack::Middleware::Session](http://search.cpan.org/perldoc?Plack::Middleware::Session), unless you are writing your
-own session middleware component.
+This is a Plack Middleware component for session management. By
+default it will use cookies to keep session state and store data in
+memory. This distribution also comes with other state and store
+solutions. See perldoc for these backends how to use them.
 
-# METHODS
+It should be noted that we store the current session as a hash
+reference in the `psgix.session` key inside the `$env` where you can
+access it as needed.
 
-- __new ( $env )__
+__NOTE:__ As of version 0.04 the session is stored in `psgix.session`
+instead of `plack.session`.
 
-    The constructor takes a PSGI request env hash reference.
+## State
 
-- __id__
+- [Plack::Session::State](http://search.cpan.org/perldoc?Plack::Session::State)
 
-    This is the accessor for the session id.
+    This will maintain session state by passing the session through
+    the request params. It does not do this automatically though,
+    you are responsible for passing the session param.
 
-## Session Data Management
+- [Plack::Session::State::Cookie](http://search.cpan.org/perldoc?Plack::Session::State::Cookie)
 
-These methods allows you to read and write the session data like
-Perl's normal hash.
+    This will maintain session state using browser cookies.
 
-- __get ( $key )__
-- __set ( $key, $value )__
-- __remove ( $key )__
-- __keys__
-- __session__, __dump__
+## Store
 
-## Session Lifecycle Management
+- [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store)
 
-- __expire__
+    This is your basic in-memory session data store. It is volatile storage
+    and not recommended for multiprocessing environments. However it is
+    very useful for development and testing.
 
-    This method can be called to expire the current session id.
+- [Plack::Session::Store::File](http://search.cpan.org/perldoc?Plack::Session::Store::File)
+
+    This will persist session data in a file. By default it uses
+    [Storable](http://search.cpan.org/perldoc?Storable) but it can be configured to have a custom serializer and
+    deserializer.
+
+- [Plack::Session::Store::Cache](http://search.cpan.org/perldoc?Plack::Session::Store::Cache)
+
+    This will persist session data using the [Cache](http://search.cpan.org/perldoc?Cache) interface.
+
+- [Plack::Session::Store::Null](http://search.cpan.org/perldoc?Plack::Session::Store::Null)
+
+    Sometimes you don't care about storing session data, in that case
+    you can use this noop module.
+
+# OPTIONS
+
+The following are options that can be passed to this module.
+
+- _state_
+
+    This is expected to be an instance of [Plack::Session::State](http://search.cpan.org/perldoc?Plack::Session::State) or an
+    object that implements the same interface. If no option is provided
+    the default [Plack::Session::State::Cookie](http://search.cpan.org/perldoc?Plack::Session::State::Cookie) will be used.
+
+- _store_
+
+    This is expected to be an instance of [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store) or an
+    object that implements the same interface. If no option is provided
+    the default [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store) will be used.
+
+    It should be noted that this default is an in-memory volatile store
+    is only suitable for development (or single process servers). For a
+    more robust solution see [Plack::Session::Store::File](http://search.cpan.org/perldoc?Plack::Session::Store::File) or
+    [Plack::Session::Store::Cache](http://search.cpan.org/perldoc?Plack::Session::Store::Cache).
 
 # BUGS
 
@@ -62,6 +105,8 @@ exception. If you find a bug please either email me, or add the bug
 to cpan-RT.
 
 # AUTHOR
+
+Tatsuhiko Miyagawa
 
 Stevan Little <stevan.little@iinteractive.com>
 

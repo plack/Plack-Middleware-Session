@@ -2,6 +2,9 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.20  2013-06-24 16:09:21 PDT
+        - Fix packaging (name casing)
+
 0.19  2013-06-24 15:09:55 PDT
         - Use Milla
         - Add prereqs to LWP/HTTP::Cookies

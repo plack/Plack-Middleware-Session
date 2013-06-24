@@ -1,7 +1,7 @@
 {
    "abstract" : "Middleware for session management",
    "author" : [
-      "Stevan Little <stevan.little@iinteractive.com>"
+      "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "plack-middleware-session",
+   "name" : "Plack-Middleware-Session",
    "no_index" : {
       "directory" : [
          "t",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/stevan/plack-middleware-session"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Lee Aylward <lee@laylward.com>",
