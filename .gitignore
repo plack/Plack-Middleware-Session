@@ -3,3 +3,9 @@ MANIFEST.SKIP
 META\.*
 MYMETA\.*
 *~
+/plack-middleware-session-*
+/.build
+/_build_params
+/Build
+!Build/
+!META.json
