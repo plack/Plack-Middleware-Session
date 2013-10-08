@@ -7,6 +7,7 @@ our $AUTHORITY = 'cpan:STEVAN';
 
 use Digest::SHA1 ();
 
+use Plack::Request;
 use Plack::Util::Accessor qw[
     session_key
     sid_generator
