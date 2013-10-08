@@ -6,8 +6,8 @@ our $VERSION   = '0.20';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use parent 'Plack::Session::State';
-use Plack::Request;
-use Plack::Response;
+use Cookie::Baker;
+use Plack::Util;
 
 use Plack::Util::Accessor qw[
     path
@@ -19,7 +19,7 @@ use Plack::Util::Accessor qw[
 
 sub get_session_id {
     my ($self, $env) = @_;
-    Plack::Request->new($env)->cookies->{$self->session_key};
+    crush_cookie($env->{HTTP_COOKIE})->{$self->session_key};
 }
 
 sub merge_options {
@@ -55,15 +55,13 @@ sub finalize {
 sub _set_cookie {
     my($self, $id, $res, %options) = @_;
 
-    # TODO: Do not use Plack::Response
-    my $response = Plack::Response->new(@$res);
-    $response->cookies->{ $self->session_key } = +{
-        value => $id,
-        %options,
-    };
-
-    my $final_r = $response->finalize;
-    $res->[1] = $final_r->[1]; # headers
+    my $cookie = bake_cookie( 
+        $self->session_key, {
+            value => $id,
+            %options,            
+        }
+    );
+    Plack::Util::header_push($res->[1], 'Set-Cookie', $cookie);
 }
 
 1;
