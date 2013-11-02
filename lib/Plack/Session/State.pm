@@ -5,7 +5,7 @@ use warnings;
 our $VERSION   = '0.21';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Digest::SHA1 ();
+use Digest::SHA ();
 
 use Plack::Request;
 use Plack::Util::Accessor qw[
@@ -19,7 +19,7 @@ sub new {
 
     $params{'session_key'}   ||= 'plack_session';
     $params{'sid_generator'} ||= sub {
-        Digest::SHA1::sha1_hex(rand() . $$ . {} . time)
+        Digest::SHA::sha1_hex(rand() . $$ . {} . time)
     };
     $params{'sid_validator'} ||= qr/\A[0-9a-f]{40}\Z/;
 
