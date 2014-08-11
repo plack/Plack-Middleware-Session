@@ -16,6 +16,11 @@ use Plack::Session::State::Cookie;
 sub prepare_app {
     my $self = shift;
 
+    warn <<WARN unless $self->secret;
+WARNING: You seem to enable Plack::Session::Middleware::Cookie without setting 'secret' option!
+WARNING: It is vulnerable to arbitrary code execution and in the future releases you'll get an error.
+WARN
+
     $self->session_key("plack_session") unless $self->session_key;
 
     $self->serializer(sub {MIME::Base64::encode(Storable::nfreeze($_[0]), '' )})
@@ -115,6 +120,11 @@ options are accepted.
 Server side secret to sign the session data using HMAC SHA1. Defaults
 to nothing (i.e. do not sign) but B<strongly recommended> to set your
 own secret string.
+
+Unless you use your own serializer/deserializer, running this
+middleware without setting a secret is vulnerable to arbitrary code
+execution. B<In the future release it will be required to set the
+secret>.
 
 =item session_key, domain, expires, path, secure, httponly
 
