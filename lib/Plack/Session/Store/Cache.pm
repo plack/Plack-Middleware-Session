@@ -2,7 +2,7 @@ package Plack::Session::Store::Cache;
 use strict;
 use warnings;
 
-our $VERSION   = '0.22';
+our $VERSION   = '0.23';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Scalar::Util qw[ blessed ];
