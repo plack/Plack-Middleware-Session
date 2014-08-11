@@ -16,10 +16,8 @@ use Plack::Session::State::Cookie;
 sub prepare_app {
     my $self = shift;
 
-    warn <<WARN unless $self->secret;
-WARNING: You seem to enable Plack::Session::Middleware::Cookie without setting 'secret' option!
-WARNING: It is vulnerable to arbitrary code execution and in the future releases you'll get an error.
-WARN
+    die "Plack::Session::Middleware::Cookie requires setting 'secret' option."
+      unless $self->secret;
 
     $self->session_key("plack_session") unless $self->session_key;
 
