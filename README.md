@@ -39,40 +39,40 @@ It should be noted that we store the current session as a hash
 reference in the `psgix.session` key inside the `$env` where you can
 access it as needed.
 
-__NOTE:__ As of version 0.04 the session is stored in `psgix.session`
+**NOTE:** As of version 0.04 the session is stored in `psgix.session`
 instead of `plack.session`.
 
 ## State
 
-- [Plack::Session::State](http://search.cpan.org/perldoc?Plack::Session::State)
+- [Plack::Session::State](https://metacpan.org/pod/Plack::Session::State)
 
     This will maintain session state by passing the session through
     the request params. It does not do this automatically though,
     you are responsible for passing the session param.
 
-- [Plack::Session::State::Cookie](http://search.cpan.org/perldoc?Plack::Session::State::Cookie)
+- [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack::Session::State::Cookie)
 
     This will maintain session state using browser cookies.
 
 ## Store
 
-- [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store)
+- [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store)
 
     This is your basic in-memory session data store. It is volatile storage
     and not recommended for multiprocessing environments. However it is
     very useful for development and testing.
 
-- [Plack::Session::Store::File](http://search.cpan.org/perldoc?Plack::Session::Store::File)
+- [Plack::Session::Store::File](https://metacpan.org/pod/Plack::Session::Store::File)
 
     This will persist session data in a file. By default it uses
-    [Storable](http://search.cpan.org/perldoc?Storable) but it can be configured to have a custom serializer and
+    [Storable](https://metacpan.org/pod/Storable) but it can be configured to have a custom serializer and
     deserializer.
 
-- [Plack::Session::Store::Cache](http://search.cpan.org/perldoc?Plack::Session::Store::Cache)
+- [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack::Session::Store::Cache)
 
-    This will persist session data using the [Cache](http://search.cpan.org/perldoc?Cache) interface.
+    This will persist session data using the [Cache](https://metacpan.org/pod/Cache) interface.
 
-- [Plack::Session::Store::Null](http://search.cpan.org/perldoc?Plack::Session::Store::Null)
+- [Plack::Session::Store::Null](https://metacpan.org/pod/Plack::Session::Store::Null)
 
     Sometimes you don't care about storing session data, in that case
     you can use this noop module.
@@ -83,20 +83,20 @@ The following are options that can be passed to this module.
 
 - _state_
 
-    This is expected to be an instance of [Plack::Session::State](http://search.cpan.org/perldoc?Plack::Session::State) or an
+    This is expected to be an instance of [Plack::Session::State](https://metacpan.org/pod/Plack::Session::State) or an
     object that implements the same interface. If no option is provided
-    the default [Plack::Session::State::Cookie](http://search.cpan.org/perldoc?Plack::Session::State::Cookie) will be used.
+    the default [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack::Session::State::Cookie) will be used.
 
 - _store_
 
-    This is expected to be an instance of [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store) or an
+    This is expected to be an instance of [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) or an
     object that implements the same interface. If no option is provided
-    the default [Plack::Session::Store](http://search.cpan.org/perldoc?Plack::Session::Store) will be used.
+    the default [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) will be used.
 
     It should be noted that this default is an in-memory volatile store
     is only suitable for development (or single process servers). For a
-    more robust solution see [Plack::Session::Store::File](http://search.cpan.org/perldoc?Plack::Session::Store::File) or
-    [Plack::Session::Store::Cache](http://search.cpan.org/perldoc?Plack::Session::Store::Cache).
+    more robust solution see [Plack::Session::Store::File](https://metacpan.org/pod/Plack::Session::Store::File) or
+    [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack::Session::Store::Cache).
 
 # BUGS
 

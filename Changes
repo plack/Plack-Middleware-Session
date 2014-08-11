@@ -2,6 +2,11 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.22  2014-08-11 10:16:51 PDT
+        - Document the vunlerability of using this middleware without secret, and
+          warn when secret is not set on the runtime. In the next release the default
+          will be changed to require the secret. (mala)
+
 0.21  2013-10-12 11:41:37 PDT
         - use Cookie::Baker (kazeburo)
 
