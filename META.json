@@ -52,7 +52,7 @@
          }
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/stevan/plack-middleware-session/issues"
@@ -64,7 +64,7 @@
          "web" : "https://github.com/stevan/plack-middleware-session"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Lee Aylward <lee@laylward.com>",
