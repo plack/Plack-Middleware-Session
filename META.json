@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -26,11 +26,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.037"
+            "Module::Build::Tiny" : "0.038"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.8",
             "Test::Pod" : "1.41"
          }
       },
@@ -64,7 +65,7 @@
          "web" : "https://github.com/stevan/plack-middleware-session"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Lee Aylward <lee@laylward.com>",
