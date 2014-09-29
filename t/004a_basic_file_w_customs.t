@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use File::Spec;
+use File::Temp qw(tempdir);
 use Test::Requires 'YAML';
 
 use Test::More;
@@ -13,14 +14,11 @@ use Plack::Session::Store::File;
 
 use t::lib::TestSessionHash;
 
-my $TMP = File::Spec->catdir('t', 'tmp');
-if ( !-d $TMP ) {
-    mkdir $TMP;
-}
+my $tmp = tempdir(CLEANUP => 1);
 
 t::lib::TestSessionHash::run_all_tests(
     store  => Plack::Session::Store::File->new(
-        dir          => $TMP,
+        dir          => $tmp,
         serializer   => sub { YAML::DumpFile( reverse @_ ) }, # YAML takes it's args the opposite of Storable
         deserializer => sub { YAML::LoadFile( @_ ) },
     ),
@@ -38,7 +36,5 @@ t::lib::TestSessionHash::run_all_tests(
         };
     },
 );
-
-unlink $_ foreach glob( File::Spec->catdir($TMP, '*') );
 
 done_testing;
