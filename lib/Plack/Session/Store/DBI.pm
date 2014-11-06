@@ -131,6 +131,18 @@ Plack::Session::Store::DBI - DBI-based session store
       $app;
   };
 
+
+  # use custom session table name
+
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::DBI->new(
+              dbh        => DBI->connect( @connect_args ),
+              table_name => 'my_session_table',
+          );
+      $app;
+  };
+
 =head1 DESCRIPTION
 
 This implements a DBI based storage for session data. By
