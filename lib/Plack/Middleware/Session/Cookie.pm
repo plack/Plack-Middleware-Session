@@ -96,7 +96,11 @@ Plack::Middleware::Session::Cookie - Session middleware that saves session data 
 
 =head1 SYNOPSIS
 
-  enable "Session::Cookie";
+  enable 'Session::Cookie',
+    session_key => 'my_session',
+    expires     => 3600, # 1 hour
+    secret      => 'top-secret'
+    ;
 
 =head1 DESCRIPTION
 
