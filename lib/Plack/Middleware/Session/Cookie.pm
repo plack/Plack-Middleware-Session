@@ -139,6 +139,10 @@ L<Plack::Session::State::Cookie> for these options.
 
 Tatsuhiko Miyagawa
 
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
+
 =head1 SEE ALSO
 
 Rack::Session::Cookie L<Dancer::Session::Cookie>

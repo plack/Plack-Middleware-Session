@@ -101,4 +101,8 @@ to cpan-RT.
 
 Masahiro Chiba
 
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
+
 =cut

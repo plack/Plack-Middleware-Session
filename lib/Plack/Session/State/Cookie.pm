@@ -55,10 +55,10 @@ sub finalize {
 sub _set_cookie {
     my($self, $id, $res, %options) = @_;
 
-    my $cookie = bake_cookie( 
+    my $cookie = bake_cookie(
         $self->session_key, {
             value => $id,
-            %options,            
+            %options,
         }
     );
     Plack::Util::header_push($res->[1], 'Set-Cookie', $cookie);
@@ -140,6 +140,10 @@ to cpan-RT.
 =head1 AUTHOR
 
 Stevan Little E<lt>stevan.little@iinteractive.comE<gt>
+
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
 
 =head1 COPYRIGHT AND LICENSE
 
