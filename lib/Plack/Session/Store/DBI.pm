@@ -167,7 +167,7 @@ or larger.
 
 =head1 AUTHORS
 
-Many aspects of this module were partially based upon Catalyst::Plugin::Session::Store::DBI
+Many aspects of this module were partially based upon L<Catalyst::Plugin::Session::Store::DBI>
 
 Daisuke Maki
 
