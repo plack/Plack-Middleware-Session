@@ -147,5 +147,14 @@ L<https://github.com/stevan/plack-middleware-session.git>
 
 Rack::Session::Cookie L<Dancer::Session::Cookie>
 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009, 2010 Infinity Interactive, Inc.
+
+L<http://www.iinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =cut
 
