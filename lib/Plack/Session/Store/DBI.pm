@@ -4,7 +4,7 @@ use warnings;
 
 # XXX Is there a notion of auto-expiry?
 
-our $VERSION   = '0.10';
+our $VERSION   = '0.23';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use MIME::Base64 ();
