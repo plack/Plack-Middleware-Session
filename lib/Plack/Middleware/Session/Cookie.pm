@@ -1,5 +1,9 @@
 package Plack::Middleware::Session::Cookie;
 use strict;
+
+our $VERSION   = '0.25';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use parent qw(Plack::Middleware::Session);
 
 use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
