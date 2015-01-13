@@ -141,7 +141,7 @@ Tatsuhiko Miyagawa
 
 =head1 SEE ALSO
 
-Rack::Session::Cookie L<Dancer::Session::Cookie>
+L<Rack::Session::Cookie|http://www.rubydoc.info/github/rack/rack/Rack/Session/Cookie> L<Dancer::Session::Cookie>
 
 =cut
 
