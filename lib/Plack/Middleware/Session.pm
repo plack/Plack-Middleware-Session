@@ -73,9 +73,7 @@ sub commit {
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
-    if ($options->{expire}) {
-        $self->store->remove($options->{id});
-    } elsif ($options->{change_id}) {
+    if ($options->{change_id}) {
         $self->store->remove($options->{id});
         $options->{id} = $self->generate_id($env);
         $self->store->store($options->{id}, $session);
@@ -90,16 +88,17 @@ sub finalize {
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
-    $self->commit($env) unless $options->{no_store};
     if ($options->{expire}) {
         $self->expire_session($options->{id}, $res, $env);
     } else {
+        $self->commit($env) unless $options->{no_store};
         $self->save_state($options->{id}, $res, $env);
     }
 }
 
 sub expire_session {
     my($self, $id, $res, $env) = @_;
+    $self->store->remove($id);
     $self->state->expire_session_id($id, $res, $env->{'psgix.session.options'});
 }
 
