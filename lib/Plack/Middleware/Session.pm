@@ -240,6 +240,40 @@ L<Plack::Session::Store::Cache>.
 
 =back
 
+=head1 PLACK REQUEST OPTIONS
+
+In addition to providing a C<psgix.session> key in C<$env> for
+persistent session information, this module also provides a
+C<psgix.session.options> key which can be used to control the behavior
+of the module per-request.  The following sub-keys exist:
+
+=over
+
+=item I<change_id>
+
+If set to a true value, forces the session identifier to change.  This
+should always be done after logging in, to prevent session fixation
+attacks from subdomains; see
+L<http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking>
+
+=item I<expire>
+
+If set to a true value, expunges the session from the store, and clears
+the state in the client.
+
+=item I<no_store>
+
+If set to a true value, no changes made to the session in this request
+will be saved to the store.  Either L</expire> and I</change_id> take
+precedence over this, as both need to update the session store.
+
+=item I<id>
+
+This key contains the session identifier of the session.  It should be
+considered read-only; to generate a new identifier, use L</change_id>.
+
+=back
+
 =head1 BUGS
 
 All complex software has bugs lurking in it, and this module is no
