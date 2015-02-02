@@ -7,6 +7,7 @@ our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util;
 use Scalar::Util;
+use Plack::Session::Cleanup;
 
 use parent 'Plack::Middleware';
 
@@ -73,7 +74,17 @@ sub commit {
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
-    $self->store->store($options->{id}, $session);
+    my $end = sub {
+        return if $options->{no_store};
+        $self->store->store($options->{id}, $session);
+    };
+
+    if ($env->{'psgix.cleanup'}) {
+        push @{$env->{'psgix.cleanup.handlers'}}, $end;
+    } else {
+        $env->{'psgix.session.cleanup'}
+            = Plack::Session::Cleanup->new($end);
+    }
 }
 
 sub finalize {
@@ -85,7 +96,7 @@ sub finalize {
     if ($options->{expire}) {
         $self->expire_session($options->{id}, $res, $env);
     } else {
-        $self->commit($env) unless $options->{no_store};
+        $self->commit($env);
         $self->change_id($env) if $options->{change_id};
         $self->save_state($options->{id}, $res, $env);
     }
