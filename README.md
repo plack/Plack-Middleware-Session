@@ -98,6 +98,36 @@ The following are options that can be passed to this module.
     more robust solution see [Plack::Session::Store::File](https://metacpan.org/pod/Plack::Session::Store::File) or
     [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack::Session::Store::Cache).
 
+# PLACK REQUEST OPTIONS
+
+In addition to providing a `psgix.session` key in `$env` for
+persistent session information, this module also provides a
+`psgix.session.options` key which can be used to control the behavior
+of the module per-request.  The following sub-keys exist:
+
+- _change\_id_
+
+    If set to a true value, forces the session identifier to change.  This
+    should always be done after logging in, to prevent session fixation
+    attacks from subdomains; see
+    [http://en.wikipedia.org/wiki/Session\_fixation#Attacks\_using\_cross-subdomain\_cooking](http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking)
+
+- _expire_
+
+    If set to a true value, expunges the session from the store, and clears
+    the state in the client.
+
+- _no\_store_
+
+    If set to a true value, no changes made to the session in this request
+    will be saved to the store.  Either ["expire"](#expire) and _/change\_id_ take
+    precedence over this, as both need to update the session store.
+
+- _id_
+
+    This key contains the session identifier of the session.  It should be
+    considered read-only; to generate a new identifier, use ["change\_id"](#change_id).
+
 # BUGS
 
 All complex software has bugs lurking in it, and this module is no

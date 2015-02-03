@@ -2,6 +2,10 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.26  2015-02-03 09:17:38 CET
+        - Improved documentation (oalders, basiliscos, Mohammad Anwar, alexmv)
+        - Session storage is now updated in the cleanup phase, after the streaming is complete (alexmv) #28
+
 0.25  2014-09-28 20:07:42 PDT
         - Make tests safer for parallel execution. #21
 

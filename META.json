@@ -4,13 +4,13 @@
       "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Session",
    "no_index" : {
@@ -26,12 +26,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.038"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.8",
+            "Dist::Milla" : "v1.0.14",
             "Test::Pod" : "1.41"
          }
       },
@@ -65,19 +65,24 @@
          "web" : "https://github.com/stevan/plack-middleware-session"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_contributors" : [
+      "Alex Vandiver <alex@chmrr.net>",
+      "franck cuny <franck@lumberjaph.net>",
       "Graham Knop <haarg@haarg.org>",
+      "Ivan Baidakou <basiliscos@openmailbox.com>",
       "Lee Aylward <lee@laylward.com>",
+      "lestrrat <lestrrat+github@gmail.com>",
       "Mark Stosberg <mark@stosberg.com>",
       "Masahiro Chiba <chiba@geminium.com>",
       "Masahiro Nagano <kazeburo@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "s-aska <s.aska.org@gmail.com>",
       "Stevan Little <stevan.little@iinteractive.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Tatsuhiko Miyagawa <miyagawa@gmail.com>",
-      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
-      "franck cuny <franck@lumberjaph.net>",
-      "lestrrat <lestrrat+github@gmail.com>",
-      "s-aska <s.aska.org@gmail.com>"
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ]
 }
 
