@@ -7,6 +7,7 @@ our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util;
 use Scalar::Util;
+use Plack::Session::Cleanup;
 
 use parent 'Plack::Middleware';
 
@@ -73,14 +74,16 @@ sub commit {
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
-    if ($options->{expire}) {
-        $self->store->remove($options->{id});
-    } elsif ($options->{change_id}) {
-        $self->store->remove($options->{id});
-        $options->{id} = $self->generate_id($env);
+    my $end = sub {
+        return if $options->{no_store};
         $self->store->store($options->{id}, $session);
+    };
+
+    if ($env->{'psgix.cleanup'}) {
+        push @{$env->{'psgix.cleanup.handlers'}}, $end;
     } else {
-        $self->store->store($options->{id}, $session);
+        $env->{'psgix.session.cleanup'}
+            = Plack::Session::Cleanup->new($end);
     }
 }
 
@@ -90,16 +93,27 @@ sub finalize {
     my $session = $env->{'psgix.session'};
     my $options = $env->{'psgix.session.options'};
 
-    $self->commit($env) unless $options->{no_store};
     if ($options->{expire}) {
         $self->expire_session($options->{id}, $res, $env);
     } else {
+        $self->commit($env);
+        $self->change_id($env) if $options->{change_id};
         $self->save_state($options->{id}, $res, $env);
     }
 }
 
+sub change_id {
+    my($self, $env) = @_;
+
+    my $options = $env->{'psgix.session.options'};
+
+    $self->store->remove($options->{id});
+    $options->{id} = $self->generate_id($env);
+}
+
 sub expire_session {
     my($self, $id, $res, $env) = @_;
+    $self->store->remove($id);
     $self->state->expire_session_id($id, $res, $env->{'psgix.session.options'});
 }
 
@@ -223,6 +237,40 @@ It should be noted that this default is an in-memory volatile store
 is only suitable for development (or single process servers). For a
 more robust solution see L<Plack::Session::Store::File> or
 L<Plack::Session::Store::Cache>.
+
+=back
+
+=head1 PLACK REQUEST OPTIONS
+
+In addition to providing a C<psgix.session> key in C<$env> for
+persistent session information, this module also provides a
+C<psgix.session.options> key which can be used to control the behavior
+of the module per-request.  The following sub-keys exist:
+
+=over
+
+=item I<change_id>
+
+If set to a true value, forces the session identifier to change.  This
+should always be done after logging in, to prevent session fixation
+attacks from subdomains; see
+L<http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking>
+
+=item I<expire>
+
+If set to a true value, expunges the session from the store, and clears
+the state in the client.
+
+=item I<no_store>
+
+If set to a true value, no changes made to the session in this request
+will be saved to the store.  Either L</expire> and I</change_id> take
+precedence over this, as both need to update the session store.
+
+=item I<id>
+
+This key contains the session identifier of the session.  It should be
+considered read-only; to generate a new identifier, use L</change_id>.
 
 =back
 

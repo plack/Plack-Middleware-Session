@@ -66,6 +66,19 @@ sub generate_id {
 
 sub commit { }
 
+sub change_id {
+    my($self, $env) = @_;
+
+    my $options = $env->{'psgix.session.options'};
+
+    $options->{id} = $self->generate_id($env);
+}
+
+sub expire_session {
+    my($self, $id, $res, $env) = @_;
+    $self->state->expire_session_id($id, $res, $env->{'psgix.session.options'});
+}
+
 sub save_state {
     my($self, $id, $res, $env) = @_;
 
