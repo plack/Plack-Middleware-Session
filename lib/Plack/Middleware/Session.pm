@@ -79,7 +79,9 @@ sub commit {
         $self->store->store($options->{id}, $session);
     };
 
-    if ($env->{'psgix.cleanup'}) {
+    if (not $options->{late_store}) {
+        $end->();
+    } elsif ($env->{'psgix.cleanup'}) {
         push @{$env->{'psgix.cleanup.handlers'}}, $end;
     } else {
         $env->{'psgix.session.cleanup'}
@@ -96,8 +98,8 @@ sub finalize {
     if ($options->{expire}) {
         $self->expire_session($options->{id}, $res, $env);
     } else {
-        $self->commit($env);
         $self->change_id($env) if $options->{change_id};
+        $self->commit($env);
         $self->save_state($options->{id}, $res, $env);
     }
 }
@@ -266,6 +268,18 @@ the state in the client.
 If set to a true value, no changes made to the session in this request
 will be saved to the store.  Either L</expire> and I</change_id> take
 precedence over this, as both need to update the session store.
+
+=item I<late_store>
+
+If set to a true value, the session will be saved at the I<end> of the
+request, after all data has been sent to the client -- this may be
+required if streaming responses attempt to alter the session after the
+header has already been sent to the client.  Note, however, that it
+introduces a possible race condition, where the server attempts to store
+the updated session before the client makes the next request.  For
+redirects, or other responses on which the client needs do minimal
+processing before making a second request, this race is quite possible
+to win -- causing the second request to obtain stale session data.
 
 =item I<id>
 
