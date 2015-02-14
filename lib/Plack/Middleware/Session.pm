@@ -98,8 +98,8 @@ sub finalize {
     if ($options->{expire}) {
         $self->expire_session($options->{id}, $res, $env);
     } else {
-        $self->commit($env);
         $self->change_id($env) if $options->{change_id};
+        $self->commit($env);
         $self->save_state($options->{id}, $res, $env);
     }
 }
