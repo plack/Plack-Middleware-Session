@@ -2,6 +2,10 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.27  2015-02-13 16:52:11 PST
+        - Added late_store in psgix.session.options to update the session after the streaming
+          and reverts the default behavior to pre-0.26 (reported by darkkar, fixed by alexmv) #29, #30
+
 0.26  2015-02-03 09:17:38 CET
         - Improved documentation (oalders, basiliscos, Mohammad Anwar, alexmv)
         - Session storage is now updated in the cleanup phase, after the streaming is complete (alexmv) #28

@@ -123,6 +123,18 @@ of the module per-request.  The following sub-keys exist:
     will be saved to the store.  Either ["expire"](#expire) and _/change\_id_ take
     precedence over this, as both need to update the session store.
 
+- _late\_store_
+
+    If set to a true value, the session will be saved at the _end_ of the
+    request, after all data has been sent to the client -- this may be
+    required if streaming responses attempt to alter the session after the
+    header has already been sent to the client.  Note, however, that it
+    introduces a possible race condition, where the server attempts to store
+    the updated session before the client makes the next request.  For
+    redirects, or other responses on which the client needs do minimal
+    processing before making a second request, this race is quite possible
+    to win -- causing the second request to obtain stale session data.
+
 - _id_
 
     This key contains the session identifier of the session.  It should be
