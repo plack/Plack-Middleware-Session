@@ -2,6 +2,9 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.28  2015-02-16 08:30:08 PST
+        - Same as 0.27. Make it non-trial
+
 0.27  2015-02-13 16:52:11 PST
         - Added late_store in psgix.session.options to update the session after the streaming
           and reverts the default behavior to pre-0.26 (reported by darkkar, fixed by alexmv) #29, #30
