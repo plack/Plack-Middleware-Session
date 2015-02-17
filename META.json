@@ -56,13 +56,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/stevan/plack-middleware-session/issues"
+         "web" : "https://github.com/plack/Plack-Middleware-Session/issues"
       },
-      "homepage" : "https://github.com/stevan/plack-middleware-session",
+      "homepage" : "https://github.com/plack/Plack-Middleware-Session",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/stevan/plack-middleware-session.git",
-         "web" : "https://github.com/stevan/plack-middleware-session"
+         "url" : "https://github.com/plack/Plack-Middleware-Session.git",
+         "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
    "version" : "0.28",
