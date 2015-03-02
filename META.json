@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
          "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_contributors" : [
       "Alex Vandiver <alex@chmrr.net>",
       "franck cuny <franck@lumberjaph.net>",
