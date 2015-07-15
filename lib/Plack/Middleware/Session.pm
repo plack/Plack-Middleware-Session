@@ -253,7 +253,7 @@ of the module per-request.  The following sub-keys exist:
 
 =item I<change_id>
 
-If set to a true value, forces the session identifier to change.  This
+If set to a true value, forces the session identifier to change (rotate).  This
 should always be done after logging in, to prevent session fixation
 attacks from subdomains; see
 L<http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking>
