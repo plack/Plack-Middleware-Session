@@ -266,7 +266,7 @@ the state in the client.
 =item I<no_store>
 
 If set to a true value, no changes made to the session in this request
-will be saved to the store.  Either L</expire> and I</change_id> take
+will be saved to the store.  Either L</expire> and L</change_id> take
 precedence over this, as both need to update the session store.
 
 =item I<late_store>
