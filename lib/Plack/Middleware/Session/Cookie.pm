@@ -1,5 +1,9 @@
 package Plack::Middleware::Session::Cookie;
 use strict;
+
+our $VERSION   = '0.25';
+our $AUTHORITY = 'cpan:STEVAN';
+
 use parent qw(Plack::Middleware::Session);
 
 use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
@@ -152,9 +156,22 @@ L<Plack::Session::State::Cookie> for these options.
 
 Tatsuhiko Miyagawa
 
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
+
 =head1 SEE ALSO
 
 L<Rack::Session::Cookie|http://www.rubydoc.info/github/rack/rack/Rack/Session/Cookie> L<Dancer::Session::Cookie>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009, 2010 Infinity Interactive, Inc.
+
+L<http://www.iinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

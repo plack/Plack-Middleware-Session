@@ -99,7 +99,7 @@ Plack::Session::Store::File - Basic file-based session store
 
 This implements a basic file based storage for session data. By
 default it will use L<Storable> to serialize and deserialize the
-data, but this can be configured easily. 
+data, but this can be configured easily.
 
 This is a subclass of L<Plack::Session::Store> and implements
 its full interface.
@@ -143,6 +143,10 @@ to cpan-RT.
 =head1 AUTHOR
 
 Stevan Little E<lt>stevan.little@iinteractive.comE<gt>
+
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
 
 =head1 COPYRIGHT AND LICENSE
 

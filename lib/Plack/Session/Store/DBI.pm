@@ -22,9 +22,9 @@ sub new {
     }
 
     $params{table_name}   ||= 'sessions';
-    $params{serializer}   ||= 
+    $params{serializer}   ||=
         sub { MIME::Base64::encode_base64( Storable::nfreeze( $_[0] ) ) };
-    $params{deserializer} ||= 
+    $params{deserializer} ||=
         sub { Storable::thaw( MIME::Base64::decode_base64( $_[0] ) ) };
 
     my $self = bless { %params }, $class;
@@ -51,7 +51,7 @@ sub store {
     my ($self, $session_id, $session) = @_;
     my $table_name = $self->{table_name};
 
-    # XXX To be honest, I feel like there should be a transaction 
+    # XXX To be honest, I feel like there should be a transaction
     # call here.... but Catalyst didn't have it, so I'm not so sure
 
     my $sth = $self->_dbh->prepare_cached("SELECT 1 FROM $table_name WHERE id = ?");
@@ -59,10 +59,10 @@ sub store {
 
     # need to fetch. on some DBD's execute()'s return status and
     # rows() is not reliable
-    my ($exists) = $sth->fetchrow_array(); 
+    my ($exists) = $sth->fetchrow_array();
 
     $sth->finish;
-    
+
     if ($exists) {
         my $sth = $self->_dbh->prepare_cached("UPDATE $table_name SET session_data = ? WHERE id = ?");
         $sth->execute( $self->serializer->($session), $session_id );
@@ -71,7 +71,7 @@ sub store {
         my $sth = $self->_dbh->prepare_cached("INSERT INTO $table_name (id, session_data) VALUES (?, ?)");
         $sth->execute( $session_id , $self->serializer->($session) );
     }
-    
+
 }
 
 sub remove {
@@ -117,7 +117,7 @@ Plack::Session::Store::DBI - DBI-based session store
           );
       $app;
   };
-  
+
   # with custom serializer/deserializer
 
   builder {
@@ -146,8 +146,8 @@ Plack::Session::Store::DBI - DBI-based session store
 =head1 DESCRIPTION
 
 This implements a DBI based storage for session data. By
-default it will use L<Storable> and L<MIME::Base64> to serialize and 
-deserialize the data, but this can be configured easily. 
+default it will use L<Storable> and L<MIME::Base64> to serialize and
+deserialize the data, but this can be configured easily.
 
 This is a subclass of L<Plack::Session::Store> and implements
 its full interface.
@@ -170,6 +170,10 @@ or larger.
 Many aspects of this module were partially based upon L<Catalyst::Plugin::Session::Store::DBI>
 
 Daisuke Maki
+
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -148,6 +148,10 @@ to cpan-RT.
 
 Stevan Little E<lt>stevan.little@iinteractive.comE<gt>
 
+=head1 REPOSITORY
+
+L<https://github.com/stevan/plack-middleware-session.git>
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2009, 2010 Infinity Interactive, Inc.
