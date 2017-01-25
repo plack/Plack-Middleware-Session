@@ -38,7 +38,7 @@
          "requires" : {
             "Cookie::Baker" : "0",
             "Digest::HMAC_SHA1" : "1.03",
-            "Digest::SHA1" : "0",
+            "Digest::SHA" : "0",
             "Plack" : "0.9910"
          }
       },
