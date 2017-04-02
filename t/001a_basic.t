@@ -9,6 +9,7 @@ use Plack::Request;
 use Plack::Session::State;
 use Plack::Session::Store;
 
+use lib ".";
 use t::lib::TestSessionHash;
 
 t::lib::TestSessionHash::run_all_tests(

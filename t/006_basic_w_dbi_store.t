@@ -13,6 +13,7 @@ use Plack::Session;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store::DBI;
 
+use lib ".";
 use t::lib::TestSession;
 
 my $tmp  = tempdir(CLEANUP => 1);

@@ -11,6 +11,7 @@ use Plack::Session::State::Cookie;
 use Plack::Session::Store;
 use Plack::Util;
 
+use lib ".";
 use t::lib::TestSession;
 
 t::lib::TestSession::run_all_tests(

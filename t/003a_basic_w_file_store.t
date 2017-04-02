@@ -11,6 +11,7 @@ use Plack::Request;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store::File;
 
+use lib ".";
 use t::lib::TestSessionHash;
 
 my $tmp = tempdir(CLEANUP => 1);

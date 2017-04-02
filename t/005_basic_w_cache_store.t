@@ -10,6 +10,7 @@ use Plack::Session;
 use Plack::Session::State;
 use Plack::Session::Store::Cache;
 
+use lib ".";
 use t::lib::TestSession;
 
 {
