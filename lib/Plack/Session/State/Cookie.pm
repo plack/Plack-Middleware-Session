@@ -102,7 +102,7 @@ L<Plack::Middleware::Session>.
 
 The C<%params> can include I<path>, I<domain>, I<expires>, I<secure>,
 and I<httponly> options, as well as all the options accepted by
-L<Plack::Session::Store>.
+L<Plack::Session::State>.
 
 =item B<path>
 
