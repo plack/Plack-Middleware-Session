@@ -49,7 +49,7 @@ Plack::Session::Store - Basic in-memory session store
   };
 
   builder {
-      enable 'Session'; # this is the defalt store
+      enable 'Session'; # this is the default store
       $app;
   };
 
