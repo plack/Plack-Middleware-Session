@@ -12,7 +12,7 @@ use Storable ();
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ dbh get_dbh table_name serializer deserializer ];
+use Plack::Util::Accessor qw[ dbh get_dbh table_name serializer deserializer id_column data_column];
 
 sub new {
     my ($class, %params) = @_;
@@ -22,6 +22,8 @@ sub new {
     }
 
     $params{table_name}   ||= 'sessions';
+    $params{data_column}  ||= 'session_data';
+    $params{id_column}    ||= 'id';
     $params{serializer}   ||= 
         sub { MIME::Base64::encode_base64( Storable::nfreeze( $_[0] ) ) };
     $params{deserializer} ||= 
@@ -39,8 +41,10 @@ sub _dbh {
 sub fetch {
     my ($self, $session_id) = @_;
     my $table_name = $self->{table_name};
+    my $data_column = $self->{data_column};
+    my $id_column = $self->{id_column};
     my $dbh = $self->_dbh;
-    my $sth = $dbh->prepare_cached("SELECT session_data FROM $table_name WHERE id = ?");
+    my $sth = $dbh->prepare_cached("SELECT $data_column FROM $table_name WHERE $id_column  = ?");
     $sth->execute( $session_id );
     my ($data) = $sth->fetchrow_array();
     $sth->finish;
@@ -50,11 +54,15 @@ sub fetch {
 sub store {
     my ($self, $session_id, $session) = @_;
     my $table_name = $self->{table_name};
+    my $data_column = $self->{data_column};
+    my $id_column = $self->{id_column};
+
+    my $dbh = $self->_dbh;
 
     # XXX To be honest, I feel like there should be a transaction 
     # call here.... but Catalyst didn't have it, so I'm not so sure
 
-    my $sth = $self->_dbh->prepare_cached("SELECT 1 FROM $table_name WHERE id = ?");
+    my $sth = $dbh->prepare_cached("SELECT 1 FROM $table_name WHERE $id_column = ?");
     $sth->execute($session_id);
 
     # need to fetch. on some DBD's execute()'s return status and
@@ -64,11 +72,11 @@ sub store {
     $sth->finish;
     
     if ($exists) {
-        my $sth = $self->_dbh->prepare_cached("UPDATE $table_name SET session_data = ? WHERE id = ?");
+        my $sth = $self->_dbh->prepare_cached("UPDATE $table_name SET $data_column = ? WHERE $id_column = ?");
         $sth->execute( $self->serializer->($session), $session_id );
     }
     else {
-        my $sth = $self->_dbh->prepare_cached("INSERT INTO $table_name (id, session_data) VALUES (?, ?)");
+        my $sth = $self->_dbh->prepare_cached("INSERT INTO $table_name ($id_column, $data_column) VALUES (?, ?)");
         $sth->execute( $session_id , $self->serializer->($session) );
     }
     
@@ -77,7 +85,8 @@ sub store {
 sub remove {
     my ($self, $session_id) = @_;
     my $table_name = $self->{table_name};
-    my $sth = $self->_dbh->prepare_cached("DELETE FROM $table_name WHERE id = ?");
+    my $id_column = $self->{id_column};
+    my $sth = $self->_dbh->prepare_cached("DELETE FROM $table_name WHERE $id_column = ?");
     $sth->execute( $session_id );
     $sth->finish;
 }
@@ -132,13 +141,15 @@ Plack::Session::Store::DBI - DBI-based session store
   };
 
 
-  # use custom session table name
+  # use custom session table name, session ID or data columns
 
   builder {
       enable 'Session',
           store => Plack::Session::Store::DBI->new(
-              dbh        => DBI->connect( @connect_args ),
-              table_name => 'my_session_table',
+              dbh         => DBI->connect( @connect_args ),
+              table_name  => 'my_session_table',
+              id_column   => 'session_id',
+              data_column => 'data',
           );
       $app;
   };
@@ -164,6 +175,11 @@ Your session table must have at least the following schema structure:
 Note that MySQL TEXT fields only store 64KB, so if your session data
 will exceed that size you'll want to move to MEDIUMTEXT, MEDIUMBLOB,
 or larger.
+
+You can opt to specify alternative table names (using table_name), as well as
+alternative columns to use for session ID (id_column) and session data storage
+(data_column), especially useful if you're converting from an existing session
+mechanism.
 
 =head1 AUTHORS
 
