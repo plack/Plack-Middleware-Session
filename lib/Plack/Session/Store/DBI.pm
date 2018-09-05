@@ -70,17 +70,29 @@ sub store {
     my ($exists) = $sth->fetchrow_array(); 
 
     $sth->finish;
+
+    my %column_data = (
+        $self->additional_column_data($session),
+
+        $data_column => $self->serializer->($session),
+        $id_column => $session_id,
+    );
     
+    my @columns = sort keys %column_data;
     if ($exists) {
-        my $sth = $self->_dbh->prepare_cached("UPDATE $table_name SET $data_column = ? WHERE $id_column = ?");
-        $sth->execute( $self->serializer->($session), $session_id );
+        my $sets = join(',', map { $dbh->quote_identifier($_).' = ?' } @columns);
+        my $sth = $dbh->prepare_cached("UPDATE $table_name SET $sets WHERE $id_column = ?");
+        $sth->execute( @column_data{@columns}, $session_id );
     }
     else {
-        my $sth = $self->_dbh->prepare_cached("INSERT INTO $table_name ($id_column, $data_column) VALUES (?, ?)");
-        $sth->execute( $session_id , $self->serializer->($session) );
+        my $column_sql = join(',', map { $dbh->quote_identifier($_) } @columns);
+        my $questions = join(',', map { '?' } @columns);
+        my $sth = $dbh->prepare_cached("INSERT INTO $table_name ($column_sql) VALUES ($questions)");
+        $sth->execute( @column_data{@columns});
     }
-    
 }
+
+sub additional_column_data { }
 
 sub remove {
     my ($self, $session_id) = @_;
@@ -180,6 +192,17 @@ You can opt to specify alternative table names (using table_name), as well as
 alternative columns to use for session ID (id_column) and session data storage
 (data_column), especially useful if you're converting from an existing session
 mechanism.
+
+=head1 EXTENDING
+
+Plack::Session::Store::DBI has built in functionality to allow for inheriting
+modules to set additional columns on each session row.
+
+By overriding the additional_column_data function, you can return a hash of
+columns and values to set.  The session data hashref will be passed to the
+overridden additional_column_data function as its only argument, so that you
+can use session data values as appropriate for any additional column data you
+would like to set.
 
 =head1 AUTHORS
 
