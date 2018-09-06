@@ -26,8 +26,40 @@ CREATE TABLE sessions (
 );
 EOSQL
 
+# Building the table with these weird names will simultaneously prove that we
+# accept custom table and column names while also demonstrating that we do
+# quoting correctly, which the previous code did not.
+$dbh->do(<<EOSQL);
+CREATE TABLE 'insert' (
+    'where' CHAR(72) PRIMARY KEY,
+    'set' TEXT
+);
+EOSQL
+
 TestSession::run_all_tests(
     store  => Plack::Session::Store::DBI->new( dbh => $dbh ),
+    state  => Plack::Session::State->new,
+    env_cb => sub {
+        open my $in, '<', \do { my $d };
+        my $env = {
+            'psgi.version'    => [ 1, 0 ],
+            'psgi.input'      => $in,
+            'psgi.errors'     => *STDERR,
+            'psgi.url_scheme' => 'http',
+            SERVER_PORT       => 80,
+            REQUEST_METHOD    => 'GET',
+            QUERY_STRING      => join "&" => map { $_ . "=" . $_[0]->{ $_ } } keys %{$_[0] || +{}},
+        };
+    },
+);
+
+TestSession::run_all_tests(
+    store  => Plack::Session::Store::DBI->new(
+        dbh         => $dbh,
+        table_name  => 'insert',
+        id_column   => 'where',
+        data_column => 'set',
+    ),
     state  => Plack::Session::State->new,
     env_cb => sub {
         open my $in, '<', \do { my $d };
