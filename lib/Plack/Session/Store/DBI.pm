@@ -44,7 +44,14 @@ sub fetch {
     my $data_column = $self->{data_column};
     my $id_column = $self->{id_column};
     my $dbh = $self->_dbh;
-    my $sth = $dbh->prepare_cached("SELECT $data_column FROM $table_name WHERE $id_column  = ?");
+    my $sth = $dbh->prepare_cached(
+        sprintf(
+            "SELECT %s FROM %s WHERE %s = ?",
+            $dbh->quote_identifier($data_column),
+            $dbh->quote_identifier($table_name),
+            $dbh->quote_identifier($id_column),
+        )
+    );
     $sth->execute( $session_id );
     my ($data) = $sth->fetchrow_array();
     $sth->finish;
@@ -62,7 +69,13 @@ sub store {
     # XXX To be honest, I feel like there should be a transaction 
     # call here.... but Catalyst didn't have it, so I'm not so sure
 
-    my $sth = $dbh->prepare_cached("SELECT 1 FROM $table_name WHERE $id_column = ?");
+    my $sth = $dbh->prepare_cached(
+        sprintf(
+            "SELECT 1 FROM %s WHERE %s = ?",
+            $dbh->quote_identifier($table_name),
+            $dbh->quote_identifier($id_column),
+        )
+    );
     $sth->execute($session_id);
 
     # need to fetch. on some DBD's execute()'s return status and
@@ -80,14 +93,25 @@ sub store {
     
     my @columns = sort keys %column_data;
     if ($exists) {
-        my $sets = join(',', map { $dbh->quote_identifier($_).' = ?' } @columns);
-        my $sth = $dbh->prepare_cached("UPDATE $table_name SET $sets WHERE $id_column = ?");
+        my $sth = $dbh->prepare_cached(
+            sprintf(
+                "UPDATE %s SET %s WHERE %s = ?",
+                $dbh->quote_identifier($table_name),
+                join(',', map { $dbh->quote_identifier($_).' = ?' } @columns),
+                $dbh->quote_identifier($id_column),
+            )
+        );
         $sth->execute( @column_data{@columns}, $session_id );
     }
     else {
-        my $column_sql = join(',', map { $dbh->quote_identifier($_) } @columns);
-        my $questions = join(',', map { '?' } @columns);
-        my $sth = $dbh->prepare_cached("INSERT INTO $table_name ($column_sql) VALUES ($questions)");
+        my $sth = $dbh->prepare_cached(
+            sprintf(
+                "INSERT INTO %s (%s) VALUES (%s)",
+                $dbh->quote_identifier($table_name),
+                join(',', map { $dbh->quote_identifier($_) } @columns),
+                join(',', map { '?' } @columns),
+            )
+         );
         $sth->execute( @column_data{@columns});
     }
 }
@@ -98,7 +122,13 @@ sub remove {
     my ($self, $session_id) = @_;
     my $table_name = $self->{table_name};
     my $id_column = $self->{id_column};
-    my $sth = $self->_dbh->prepare_cached("DELETE FROM $table_name WHERE $id_column = ?");
+    my $sth = $self->_dbh->prepare_cached(
+        sprintf(
+            "DELETE FROM %s WHERE %s = ?",
+            $self->_dbh->quote_identifier($table_name),
+            $self->_dbh->quote_identifier($id_column),
+        )
+    );
     $sth->execute( $session_id );
     $sth->finish;
 }
