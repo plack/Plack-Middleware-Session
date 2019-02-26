@@ -2,6 +2,9 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.32  2019-02-26 14:36:19 MST
+        - Fix dependency for Cookie::Baker
+
 0.31  2019-02-26 12:01:00 MST
         - Documentation fix
         - Support samesite cookie attributes #42

@@ -37,7 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Cookie::Baker" : "0",
+            "Cookie::Baker" : "0.10",
             "Digest::HMAC_SHA1" : "1.03",
             "Digest::SHA1" : "0",
             "Plack" : "0.9910"
@@ -65,7 +65,7 @@
          "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_contributors" : [
       "Alex Vandiver <alex@chmrr.net>",
       "Florian Schlichting <fsfs@debian.org>",
@@ -88,7 +88,7 @@
       "vividsnow <vividsnow@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.20.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
    "x_static_install" : 1
 }
 
