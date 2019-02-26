@@ -107,7 +107,7 @@ of the module per-request.  The following sub-keys exist:
 
 - _change\_id_
 
-    If set to a true value, forces the session identifier to change.  This
+    If set to a true value, forces the session identifier to change (rotate).  This
     should always be done after logging in, to prevent session fixation
     attacks from subdomains; see
     [http://en.wikipedia.org/wiki/Session\_fixation#Attacks\_using\_cross-subdomain\_cooking](http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking)
@@ -120,7 +120,7 @@ of the module per-request.  The following sub-keys exist:
 - _no\_store_
 
     If set to a true value, no changes made to the session in this request
-    will be saved to the store.  Either ["expire"](#expire) and _/change\_id_ take
+    will be saved to the store.  Either ["expire"](#expire) and ["change\_id"](#change_id) take
     precedence over this, as both need to update the session store.
 
 - _late\_store_

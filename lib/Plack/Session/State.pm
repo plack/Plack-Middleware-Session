@@ -2,7 +2,7 @@ package Plack::Session::State;
 use strict;
 use warnings;
 
-our $VERSION   = '0.30';
+our $VERSION   = '0.31';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Digest::SHA1 ();
