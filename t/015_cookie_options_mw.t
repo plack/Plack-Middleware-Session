@@ -14,6 +14,7 @@ my $app = sub {
     $env->{'psgix.session.options'}{path}     = $path;
     $env->{'psgix.session.options'}{domain}   = '.example.com';
     $env->{'psgix.session.options'}{httponly} = 1;
+    $env->{'psgix.session.options'}{samesite} = 'Lax';
 
     return [ 200, [], [ "Hi" ] ];
 };
@@ -24,10 +25,10 @@ test_psgi $app, sub {
     my $cb = shift;
 
     my $res = $cb->(GET "http://localhost/");
-    like $res->header('Set-Cookie'), qr/plack_session=\w+; domain=.example.com; HttpOnly/;
+    like $res->header('Set-Cookie'), qr/plack_session=\w+; domain=.example.com; SameSite=Lax; HttpOnly/;
 
     $res = $cb->(GET "http://localhost/with_path");
-    like $res->header('Set-Cookie'), qr/plack_session=\w+; domain=.example.com; path=\/foo; HttpOnly/;
+    like $res->header('Set-Cookie'), qr/plack_session=\w+; domain=.example.com; path=\/foo; SameSite=Lax; HttpOnly/;
 };
 
 done_testing;

@@ -15,6 +15,7 @@ use Plack::Util::Accessor qw[
     expires
     secure
     httponly
+    samesite
 ];
 
 sub get_session_id {
@@ -31,6 +32,7 @@ sub merge_options {
     $options{domain}   = $self->domain      if !exists $options{domain} && defined $self->domain;
     $options{secure}   = $self->secure      if !exists $options{secure} && defined $self->secure;
     $options{httponly} = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
+    $options{samesite} = $self->samesite    if !exists $options{samesite} && defined $self->samesite;
 
 
     if (!exists $options{expires} && defined $self->expires) {
