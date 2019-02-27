@@ -12,5 +12,6 @@ on test => sub {
     requires 'Test::Fatal', '0.006';
     requires 'LWP::UserAgent';
     requires 'HTTP::Cookies';
+    requires 'HTTP::Request::Common';
 };
 
