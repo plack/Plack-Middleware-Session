@@ -1,8 +1,12 @@
 Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
+
+0.33  2019-03-09 15:18:15 PST
         - Removed dependency to Digest::SHA1 #45
         - Added explicit dep to HTTP::Request::Common #44
+        - Add t/lib to INC for Perl 5.26+
+        - Fix POD link
 
 0.32  2019-02-26 14:36:19 MST
         - Fix dependency for Cookie::Baker
