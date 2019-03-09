@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
+        - Removed dependency to Digest::SHA1 #45
+        - Added explicit dep to HTTP::Request::Common #44
 
 0.32  2019-02-26 14:36:19 MST
         - Fix dependency for Cookie::Baker
