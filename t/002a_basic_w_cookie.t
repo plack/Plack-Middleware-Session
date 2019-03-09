@@ -10,6 +10,7 @@ use Plack::Session::State::Cookie;
 use Plack::Session::Store;
 use Plack::Util;
 
+use lib ".";
 use t::lib::TestSessionHash;
 
 t::lib::TestSessionHash::run_all_tests(
