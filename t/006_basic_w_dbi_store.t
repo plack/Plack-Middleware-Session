@@ -13,8 +13,8 @@ use Plack::Session;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store::DBI;
 
-use lib ".";
-use t::lib::TestSession;
+use lib "t/lib";
+use TestSession;
 
 my $tmp  = tempdir(CLEANUP => 1);
 my $file = File::Spec->catfile($tmp, "006_basic_w_dbi_store.db");
@@ -26,7 +26,7 @@ CREATE TABLE sessions (
 );
 EOSQL
 
-t::lib::TestSession::run_all_tests(
+TestSession::run_all_tests(
     store  => Plack::Session::Store::DBI->new( dbh => $dbh ),
     state  => Plack::Session::State->new,
     env_cb => sub {
@@ -43,7 +43,7 @@ t::lib::TestSession::run_all_tests(
     },
 );
 
-t::lib::TestSession::run_all_tests(
+TestSession::run_all_tests(
     store  => Plack::Session::Store::DBI->new( get_dbh => sub { $dbh }  ),
     state  => Plack::Session::State->new,
     env_cb => sub {

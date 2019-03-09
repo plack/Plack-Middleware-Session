@@ -1,4 +1,4 @@
-package t::lib::TestSessionHash;
+package TestSessionHash;
 use strict;
 use warnings;
 

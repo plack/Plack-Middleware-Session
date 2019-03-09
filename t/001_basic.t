@@ -10,10 +10,10 @@ use Plack::Session;
 use Plack::Session::State;
 use Plack::Session::Store;
 
-use lib ".";
-use t::lib::TestSession;
+use lib "t/lib";
+use TestSession;
 
-t::lib::TestSession::run_all_tests(
+TestSession::run_all_tests(
     store  => Plack::Session::Store->new,
     state  => Plack::Session::State->new,
     env_cb => sub {

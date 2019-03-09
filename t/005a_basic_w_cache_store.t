@@ -9,8 +9,8 @@ use Plack::Request;
 use Plack::Session::State;
 use Plack::Session::Store::Cache;
 
-use lib ".";
-use t::lib::TestSessionHash;
+use lib "t/lib";
+use TestSessionHash;
 
 {
     package TestCache;
@@ -38,7 +38,7 @@ use t::lib::TestSessionHash;
     }
 }
 
-t::lib::TestSessionHash::run_all_tests(
+TestSessionHash::run_all_tests(
     store  => Plack::Session::Store::Cache->new( cache => TestCache->new ),
     state  => Plack::Session::State->new,
     env_cb => sub {

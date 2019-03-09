@@ -12,12 +12,12 @@ use Plack::Request;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store::File;
 
-use lib ".";
-use t::lib::TestSessionHash;
+use lib "t/lib";
+use TestSessionHash;
 
 my $tmp = tempdir(CLEANUP => 1);
 
-t::lib::TestSessionHash::run_all_tests(
+TestSessionHash::run_all_tests(
     store  => Plack::Session::Store::File->new(
         dir          => $tmp,
         serializer   => sub { YAML::DumpFile( reverse @_ ) }, # YAML takes it's args the opposite of Storable

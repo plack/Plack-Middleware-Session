@@ -9,10 +9,10 @@ use Plack::Request;
 use Plack::Session::State;
 use Plack::Session::Store;
 
-use lib ".";
-use t::lib::TestSessionHash;
+use lib "t/lib";
+use TestSessionHash;
 
-t::lib::TestSessionHash::run_all_tests(
+TestSessionHash::run_all_tests(
     store  => Plack::Session::Store->new,
     state  => Plack::Session::State->new,
     env_cb => sub {

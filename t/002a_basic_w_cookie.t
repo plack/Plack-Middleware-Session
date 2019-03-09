@@ -10,10 +10,10 @@ use Plack::Session::State::Cookie;
 use Plack::Session::Store;
 use Plack::Util;
 
-use lib ".";
-use t::lib::TestSessionHash;
+use lib "t/lib";
+use TestSessionHash;
 
-t::lib::TestSessionHash::run_all_tests(
+TestSessionHash::run_all_tests(
     store  => Plack::Session::Store->new,
     state  => Plack::Session::State::Cookie->new,
     env_cb => sub {

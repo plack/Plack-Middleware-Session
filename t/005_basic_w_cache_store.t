@@ -10,8 +10,8 @@ use Plack::Session;
 use Plack::Session::State;
 use Plack::Session::Store::Cache;
 
-use lib ".";
-use t::lib::TestSession;
+use lib "t/lib";
+use TestSession;
 
 {
     package TestCache;
@@ -39,7 +39,7 @@ use t::lib::TestSession;
     }
 }
 
-t::lib::TestSession::run_all_tests(
+TestSession::run_all_tests(
     store  => Plack::Session::Store::Cache->new( cache => TestCache->new ),
     state  => Plack::Session::State->new,
     env_cb => sub {

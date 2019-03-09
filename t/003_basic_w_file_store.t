@@ -12,12 +12,12 @@ use Plack::Session;
 use Plack::Session::State::Cookie;
 use Plack::Session::Store::File;
 
-use lib ".";
-use t::lib::TestSession;
+use lib "t/lib";
+use TestSession;
 
 my $tmp = tempdir(CLEANUP => 1);
 
-t::lib::TestSession::run_all_tests(
+TestSession::run_all_tests(
     store  => Plack::Session::Store::File->new( dir => $tmp ),
     state  => Plack::Session::State->new,
     env_cb => sub {
