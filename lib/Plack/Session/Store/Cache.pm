@@ -9,33 +9,46 @@ use Scalar::Util qw[ blessed ];
 
 use parent 'Plack::Session::Store';
 
-use Plack::Util::Accessor qw[ cache ];
+use Plack::Util::Accessor qw[ cache get_cache ];
 
 sub new {
     my ($class, %params) = @_;
 
-    die('cache require get, set and remove method.')
-        unless blessed $params{cache}
-            && $params{cache}->can('get')
-            && $params{cache}->can('set')
-            && $params{cache}->can('remove');
+    my $cache;
+    if ( $params{get_cache} ) {
+        $cache = $params{get_cache}->();
+    }
+    else {
+        $cache = $params{cache};
+        $params{get_cache} = sub { $params{cache} };
+    }
 
-    bless { %params } => $class;
+    die('cache require get, set and remove method.')
+        unless blessed $cache
+            && $cache->can('get')
+            && $cache->can('set')
+            && $cache->can('remove');
+
+    bless {
+        prefix => '',
+        %params,
+    } => $class;
 }
+
 
 sub fetch {
     my ($self, $session_id ) = @_;
-    $self->cache->get($session_id);
+    $self->get_cache->()->get($session_id);
 }
 
 sub store {
     my ($self, $session_id, $session) = @_;
-    $self->cache->set($session_id => $session);
+    $self->get_cache->()->set($session_id => $session);
 }
 
 sub remove {
     my ($self, $session_id) = @_;
-    $self->cache->remove($session_id);
+    $self->get_cache->()->remove($session_id);
 }
 
 1;
@@ -66,6 +79,15 @@ Plack::Session::Store::Cache - Cache session store
       $app;
   };
 
+# set get_cache callback for ondemand
+  builder {
+      enable 'Session',
+          store => Plack::Session::Store::Cache->new(
+              get_cache => sub { MyAppSingleton->cache }
+          );
+      $app;
+  };
+
 =head1 DESCRIPTION
 
 This will persist session data using any module which implements the
@@ -81,13 +103,17 @@ its full interface.
 
 =item B<new ( %params )>
 
-The constructor expects the I<cache> param to be an object instance
+The constructor expects the I<cache> param or return of I<get_cache> to be an object instance
 which has the I<get>, I<set>, and I<remove> methods, it will throw an
 exception if that is not the case.
 
 =item B<cache>
 
 A simple accessor for the cache handle.
+
+=item B<get_cache>
+
+A callback for the cache handle.
 
 =back
 
