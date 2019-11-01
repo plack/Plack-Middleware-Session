@@ -131,6 +131,11 @@ be included in the cookie.
 HttpOnly flag for the cookie, if nothing is supplied then it will not
 be included in the cookie.
 
+=item B<samesite>
+
+SameSite flag for the cookie, if nothing is supplied then it will not
+be included in the cookie.
+
 =back
 
 =head1 BUGS
