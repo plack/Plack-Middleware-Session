@@ -48,7 +48,7 @@ sub fetch {
         sprintf(
             "SELECT %s FROM %s WHERE %s = ?",
             $dbh->quote_identifier($data_column),
-            $dbh->quote_identifier($table_name),
+            $self->_quote_table_name($table_name),
             $dbh->quote_identifier($id_column),
         )
     );
@@ -72,7 +72,7 @@ sub store {
     my $sth = $dbh->prepare_cached(
         sprintf(
             "SELECT 1 FROM %s WHERE %s = ?",
-            $dbh->quote_identifier($table_name),
+            $self->_quote_table_name($table_name),
             $dbh->quote_identifier($id_column),
         )
     );
@@ -96,7 +96,7 @@ sub store {
         my $sth = $dbh->prepare_cached(
             sprintf(
                 "UPDATE %s SET %s WHERE %s = ?",
-                $dbh->quote_identifier($table_name),
+                $self->_quote_table_name($table_name),
                 join(',', map { $dbh->quote_identifier($_).' = ?' } @columns),
                 $dbh->quote_identifier($id_column),
             )
@@ -107,7 +107,7 @@ sub store {
         my $sth = $dbh->prepare_cached(
             sprintf(
                 "INSERT INTO %s (%s) VALUES (%s)",
-                $dbh->quote_identifier($table_name),
+                $self->_quote_table_name($table_name),
                 join(',', map { $dbh->quote_identifier($_) } @columns),
                 join(',', map { '?' } @columns),
             )
@@ -125,12 +125,18 @@ sub remove {
     my $sth = $self->_dbh->prepare_cached(
         sprintf(
             "DELETE FROM %s WHERE %s = ?",
-            $self->_dbh->quote_identifier($table_name),
+            $self->_quote_table_name($table_name),
             $self->_dbh->quote_identifier($id_column),
         )
     );
     $sth->execute( $session_id );
     $sth->finish;
+}
+
+sub _quote_table_name {
+    my ($self, $table_name) = @_;
+    my @parts = split /\./, $table_name;
+    return join '.', map { $self->_dbh->quote_identifier( $_ ) } @parts;
 }
 
 1;

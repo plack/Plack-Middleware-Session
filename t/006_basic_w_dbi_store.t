@@ -95,4 +95,8 @@ TestSession::run_all_tests(
 
 $dbh->disconnect;
 
+my $store = Plack::Session::Store::DBI->new( dbh => $dbh );
+is $store->_quote_table_name('mysession'), '"mysession"';
+is $store->_quote_table_name('otherdb.mysession'), '"otherdb"."mysession"';
+
 done_testing;
