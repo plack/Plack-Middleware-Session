@@ -6,6 +6,7 @@ our $VERSION   = '0.33';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Storable ();
+use File::Spec ();
 
 use parent 'Plack::Session::Store';
 
@@ -18,7 +19,7 @@ use Plack::Util::Accessor qw[
 sub new {
     my ($class, %params) = @_;
 
-    $params{'dir'} ||= $ENV{TMPDIR} || '/tmp';
+    $params{'dir'} ||= $ENV{TMPDIR} || File::Spec->tmpdir;
 
     die "Storage directory (" . $params{'dir'} . ") is not writeable"
         unless -w $params{'dir'};
@@ -117,7 +118,8 @@ you.
 =item B<dir>
 
 This is the directory to store the session data files in, if nothing
-is provided then "/tmp" is used.
+is provided then L<File::Spec>'s tmpdir() is used to determine the
+system's temp dir.
 
 =item B<serializer>
 
