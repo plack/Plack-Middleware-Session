@@ -2,8 +2,8 @@ package Plack::Middleware::Session::Cookie;
 use strict;
 use parent qw(Plack::Middleware::Session);
 
-use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly samesite
-                             serializer deserializer);
+use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
+                             samesite serializer deserializer);
 
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();

@@ -11,8 +11,8 @@ my $app = sub {
     $env->{'psgix.session'}->{counter} = 1;
 
     my $path = $env->{PATH_INFO} =~ /with_path/ ? "/foo" : undef;
-    $env->{'psgix.session.options'}{path}     = $path;
-    $env->{'psgix.session.options'}{domain}   = '.example.com';
+    $env->{'psgix.session.options'}{path}   = $path;
+    $env->{'psgix.session.options'}{domain} = '.example.com';
 
     return [ 200, [], [ "Hi" ] ];
 };
