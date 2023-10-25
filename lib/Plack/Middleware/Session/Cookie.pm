@@ -3,7 +3,7 @@ use strict;
 use parent qw(Plack::Middleware::Session);
 
 use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
-                             serializer deserializer);
+                             samesite serializer deserializer);
 
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();
@@ -28,7 +28,7 @@ sub prepare_app {
       unless $self->deserializer;
 
     $self->state( Plack::Session::State::Cookie->new );
-    for my $attr (qw(session_key path domain expires secure httponly)) {
+    for my $attr (qw(session_key path domain expires secure httponly samesite)) {
         $self->state->$attr($self->$attr);
     }
 }
@@ -141,7 +141,7 @@ middleware without setting a secret is vulnerable to arbitrary code
 execution. B<In the future release it will be required to set the
 secret>.
 
-=item session_key, domain, expires, path, secure, httponly
+=item session_key, domain, expires, path, secure, httponly, samesite
 
 Accessors for the cookie attributes. See
 L<Plack::Session::State::Cookie> for these options.
