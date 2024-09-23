@@ -16,6 +16,7 @@ use Plack::Util::Accessor qw[
     secure
     httponly
     samesite
+    partitioned
 ];
 
 sub get_session_id {
@@ -28,15 +29,23 @@ sub merge_options {
 
     delete $options{id};
 
-    $options{path}     = $self->path || '/' if !exists $options{path};
-    $options{domain}   = $self->domain      if !exists $options{domain} && defined $self->domain;
-    $options{secure}   = $self->secure      if !exists $options{secure} && defined $self->secure;
-    $options{httponly} = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
-    $options{samesite} = $self->samesite    if !exists $options{samesite} && defined $self->samesite;
+    $options{path}        = $self->path || '/' if !exists $options{path};
+    $options{domain}      = $self->domain      if !exists $options{domain} && defined $self->domain;
+    $options{secure}      = $self->secure      if !exists $options{secure} && defined $self->secure;
+    $options{httponly}    = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
+    $options{samesite}    = $self->samesite    if !exists $options{samesite} && defined $self->samesite;
+
+    # https://developer.mozilla.org/en-US/docs/Web/Privacy/Privacy_sandbox/Partitioned_cookies
+    $options{partitioned} = $self->partitioned if !exists $options{partitioned} && defined $self->partitioned;
 
 
     if (!exists $options{expires} && defined $self->expires) {
         $options{expires} = time + $self->expires;
+    }
+
+    if ($options{partitioned}) {
+        $options{secure} = 1;
+        $options{samesite} = 'None';
     }
 
     return %options;
@@ -57,10 +66,10 @@ sub finalize {
 sub _set_cookie {
     my($self, $id, $res, %options) = @_;
 
-    my $cookie = bake_cookie( 
+    my $cookie = bake_cookie(
         $self->session_key, {
             value => $id,
-            %options,            
+            %options,
         }
     );
     Plack::Util::header_push($res->[1], 'Set-Cookie', $cookie);

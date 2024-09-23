@@ -34,5 +34,26 @@ test_psgi $app, sub {
     like $res->header('Set-Cookie'), qr/plack_session=\S+; domain=.example.com; path=\/foo; SameSite=Lax; HttpOnly/;
 };
 
+# Partitioned Cookies
+# https://developer.mozilla.org/en-US/docs/Web/Privacy/Privacy_sandbox/Partitioned_cookies
+$app = Plack::Middleware::Session::Cookie->wrap(
+    $app,
+    secret      => 'foobar',
+    httponly    => 1,
+    partitioned => 1
+);
+
+test_psgi $app, sub {
+    my $cb = shift;
+
+    # Partitioned cookies are secure, and always have SameSite=None
+    # Lowercase "secure" provided by Cookie::Baker when using Partitioned.
+    my $res = $cb->(GET "http://localhost/");
+    like $res->header('Set-Cookie'), qr/plack_session=\S+; domain=.example.com; SameSite=None; secure; HttpOnly; Partitioned/;
+
+    $res = $cb->(GET "http://localhost/with_path");
+    like $res->header('Set-Cookie'), qr/plack_session=\S+; domain=.example.com; path=\/foo; SameSite=None; secure; HttpOnly; Partitioned/;
+};
+
 done_testing;
 
