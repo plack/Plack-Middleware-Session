@@ -1,5 +1,5 @@
 requires 'Plack'            => '0.9910';
-requires 'Cookie::Baker'    => '0.10';
+requires 'Cookie::Baker'    => '0.12';
 
 # for session ID gen
 requires 'Digest::SHA'       => '0';
