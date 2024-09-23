@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,13 +31,13 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.20",
+            "Dist::Milla" : "v1.0.22",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "Cookie::Baker" : "0.10",
+            "Cookie::Baker" : "0.12",
             "Digest::HMAC_SHA1" : "1.03",
             "Digest::SHA" : "0",
             "Plack" : "0.9910"
@@ -66,9 +66,12 @@
          "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
+      "Alexander Kuehne <alexander.kuehne@contacting.de>",
       "Alex Vandiver <alex@chmrr.net>",
+      "cho45 <cho45@lowreal.net>",
+      "Christian Walde <walde.christian@googlemail.com>",
       "Florian Schlichting <fsfs@debian.org>",
       "franck cuny <franck@lumberjaph.net>",
       "Graham Knop <gknop@omniti.com>",
@@ -83,6 +86,8 @@
       "Masahiro Nagano <kazeburo@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
+      "rawleyfowler <rawleyfowler@proton.me>",
+      "Rick Myers <rick@jrmyers.net>",
       "s-aska <s.aska.org@gmail.com>",
       "Stevan Little <stevan.little@iinteractive.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
@@ -90,8 +95,9 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "vividsnow <vividsnow@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.20.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
 

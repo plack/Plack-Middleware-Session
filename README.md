@@ -44,35 +44,35 @@ instead of `plack.session`.
 
 ## State
 
-- [Plack::Session::State](https://metacpan.org/pod/Plack::Session::State)
+- [Plack::Session::State](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AState)
 
     This will maintain session state by passing the session through
     the request params. It does not do this automatically though,
     you are responsible for passing the session param.
 
-- [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack::Session::State::Cookie)
+- [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AState%3A%3ACookie)
 
     This will maintain session state using browser cookies.
 
 ## Store
 
-- [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store)
+- [Plack::Session::Store](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore)
 
     This is your basic in-memory session data store. It is volatile storage
     and not recommended for multiprocessing environments. However it is
     very useful for development and testing.
 
-- [Plack::Session::Store::File](https://metacpan.org/pod/Plack::Session::Store::File)
+- [Plack::Session::Store::File](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore%3A%3AFile)
 
     This will persist session data in a file. By default it uses
     [Storable](https://metacpan.org/pod/Storable) but it can be configured to have a custom serializer and
     deserializer.
 
-- [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack::Session::Store::Cache)
+- [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore%3A%3ACache)
 
     This will persist session data using the [Cache](https://metacpan.org/pod/Cache) interface.
 
-- [Plack::Session::Store::Null](https://metacpan.org/pod/Plack::Session::Store::Null)
+- [Plack::Session::Store::Null](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore%3A%3ANull)
 
     Sometimes you don't care about storing session data, in that case
     you can use this noop module.
@@ -83,20 +83,20 @@ The following are options that can be passed to this module.
 
 - _state_
 
-    This is expected to be an instance of [Plack::Session::State](https://metacpan.org/pod/Plack::Session::State) or an
+    This is expected to be an instance of [Plack::Session::State](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AState) or an
     object that implements the same interface. If no option is provided
-    the default [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack::Session::State::Cookie) will be used.
+    the default [Plack::Session::State::Cookie](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AState%3A%3ACookie) will be used.
 
 - _store_
 
-    This is expected to be an instance of [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) or an
+    This is expected to be an instance of [Plack::Session::Store](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore) or an
     object that implements the same interface. If no option is provided
-    the default [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) will be used.
+    the default [Plack::Session::Store](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore) will be used.
 
     It should be noted that this default is an in-memory volatile store
     is only suitable for development (or single process servers). For a
-    more robust solution see [Plack::Session::Store::File](https://metacpan.org/pod/Plack::Session::Store::File) or
-    [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack::Session::Store::Cache).
+    more robust solution see [Plack::Session::Store::File](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore%3A%3AFile) or
+    [Plack::Session::Store::Cache](https://metacpan.org/pod/Plack%3A%3ASession%3A%3AStore%3A%3ACache).
 
 # PLACK REQUEST OPTIONS
 

@@ -2,6 +2,9 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.34  2024-09-23 09:54:12 PDT
+        - Add support for Partitioned cookies (CHIP) #51
+
 0.33  2019-03-09 15:18:15 PST
         - Removed dependency to Digest::SHA1 #45
         - Added explicit dep to HTTP::Request::Common #44
