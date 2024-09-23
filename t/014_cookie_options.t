@@ -12,12 +12,21 @@ $st->expires(3600);
 $st->path('/cgi-bin');
 
 is_deeply +{ $st->merge_options(id => 123) },
-    { domain => '.example.com', secure => 1, expires => $time + 3600, path => '/cgi-bin' };
+  { domain => '.example.com', secure => 1, expires => $time + 3600, path => '/cgi-bin' };
 
 is_deeply +{ $st->merge_options(id => 123, path => '/', domain => '.perl.org') },
-    { domain => '.perl.org', secure => 1, expires => $time + 3600, path => '/' };
+  { domain => '.perl.org', secure => 1, expires => $time + 3600, path => '/' };
+
+is_deeply +{ $st->merge_options(id => 123, expires => $time + 1, secure => 0, partitioned => 0) },
+  { domain => '.example.com', secure => 0, expires => $time + 1, path => '/cgi-bin', partitioned => 0 };
+
+is_deeply +{ $st->merge_options(id => 123, expires => $time + 1, secure => 0, partitioned => 1) },
+  { domain => '.example.com', secure => 1, samesite => 'None', expires => $time + 1, path => '/cgi-bin', partitioned => 1 };
+
+$st->partitioned(1);
 
 is_deeply +{ $st->merge_options(id => 123, expires => $time + 1, secure => 0) },
-    { domain => '.example.com', secure => 0, expires => $time + 1, path => '/cgi-bin' };
+  { domain => '.example.com', secure => 1, samesite => 'None', expires => $time + 1, path => '/cgi-bin', partitioned => 1 };
+
 
 done_testing;

@@ -3,7 +3,7 @@ use strict;
 use parent qw(Plack::Middleware::Session);
 
 use Plack::Util::Accessor qw(secret session_key domain expires path secure httponly
-                             samesite serializer deserializer);
+                             partitioned samesite serializer deserializer);
 
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();
@@ -28,7 +28,7 @@ sub prepare_app {
       unless $self->deserializer;
 
     $self->state( Plack::Session::State::Cookie->new );
-    for my $attr (qw(session_key path domain expires secure httponly samesite)) {
+    for my $attr (qw(session_key path domain expires secure partitioned httponly samesite)) {
         $self->state->$attr($self->$attr);
     }
 }
