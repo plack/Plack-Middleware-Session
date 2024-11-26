@@ -56,5 +56,23 @@ TestSession::run_all_tests(
     },
 );
 
+my $cache = TestCache->new;
+t::lib::TestSession::run_all_tests(
+    store  => Plack::Session::Store::Cache->new( get_cache => sub { $cache } ),
+    state  => Plack::Session::State->new,
+    env_cb => sub {
+        open my $in, '<', \do { my $d };
+        my $env = {
+            'psgi.version'    => [ 1, 0 ],
+            'psgi.input'      => $in,
+            'psgi.errors'     => *STDERR,
+            'psgi.url_scheme' => 'http',
+            SERVER_PORT       => 80,
+            REQUEST_METHOD    => 'GET',
+            QUERY_STRING      => join "&" => map { $_ . "=" . $_[0]->{ $_ } } keys %{$_[0] || +{}},
+        };
+    },
+);
+
 
 done_testing;
