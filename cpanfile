@@ -2,8 +2,9 @@ requires 'Plack'            => '0.9910';
 requires 'Cookie::Baker'    => '0.12';
 
 # for session ID gen
-requires 'Digest::SHA'       => '0';
+requires 'Crypt::SysRandom'  => '0';
 requires 'Digest::HMAC_SHA1' => '1.03';
+recommends 'Crypt::SysRandom::XS' => '0';
 
 # things the tests need
 on test => sub {
@@ -14,4 +15,3 @@ on test => sub {
     requires 'HTTP::Cookies';
     requires 'HTTP::Request::Common';
 };
-
