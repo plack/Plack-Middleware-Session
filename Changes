@@ -2,6 +2,9 @@ Revision history for Perl extension Plack::Middleware::Session
 
 {{$NEXT}}
 
+0.35  2025-07-07 18:49:59 EDT
+        - Added secure session ID generation using Crypt::SysRandom (#52)
+
 0.34  2024-09-23 09:54:12 PDT
         - Add support for Partitioned cookies (CHIP) #51
 

@@ -36,10 +36,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::SysRandom::XS" : "0"
+         },
          "requires" : {
             "Cookie::Baker" : "0.12",
+            "Crypt::SysRandom" : "0",
             "Digest::HMAC_SHA1" : "1.03",
-            "Digest::SHA" : "0",
             "Plack" : "0.9910"
          }
       },
@@ -66,7 +69,7 @@
          "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_contributors" : [
       "Alexander Kuehne <alexander.kuehne@contacting.de>",
       "Alex Vandiver <alex@chmrr.net>",
@@ -88,6 +91,7 @@
       "Olaf Alders <olaf@wundersolutions.com>",
       "rawleyfowler <rawleyfowler@proton.me>",
       "Rick Myers <rick@jrmyers.net>",
+      "Robert Rothenberg <rrwo@cpan.org>",
       "s-aska <s.aska.org@gmail.com>",
       "Stevan Little <stevan.little@iinteractive.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
