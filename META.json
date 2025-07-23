@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -69,7 +69,7 @@
          "web" : "https://github.com/plack/Plack-Middleware-Session"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_contributors" : [
       "Alexander Kuehne <alexander.kuehne@contacting.de>",
       "Alex Vandiver <alex@chmrr.net>",
@@ -82,11 +82,13 @@
       "Ivan Baidakou <basiliscos@openmailbox.com>",
       "James E Keenan <jkeenan@cpan.org>",
       "John Lifsey <john.lifsey@inspire.com>",
+      "Josh Ballard <josh.ballard@grantstreet.com>",
       "Lee Aylward <lee@laylward.com>",
       "lestrrat <lestrrat+github@gmail.com>",
       "Mark Stosberg <mark@stosberg.com>",
       "Masahiro Chiba <chiba@geminium.com>",
       "Masahiro Nagano <kazeburo@gmail.com>",
+      "Mitch McCracken <mitch.mccracken@grantstreet.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "rawleyfowler <rawleyfowler@proton.me>",
@@ -99,8 +101,8 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "vividsnow <vividsnow@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
